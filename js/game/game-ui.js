@@ -389,10 +389,19 @@ async function showSessionUpdate() {
         const leader = standings[0];
         const medal = '🏆';
         
+        // Fetch username properly
+        let username = leader.username;
+        if (!username || username === 'Player') {
+            username = await getUserUsername(leader.uid);
+        }
+        if (!username || username === 'Player') {
+            username = `Guest_${leader.uid.slice(0, 4)}`;
+        }
+        
         updateContent.innerHTML = `
             <div class="session-leader">
                 <h4>${medal} Current Leader</h4>
-                <p><strong>${leader.username}</strong></p>
+                <p><strong>${username}</strong></p>
                 <p>${leader.totalPoints} total points (${leader.gamesWon} wins)</p>
             </div>
             <div class="session-progress">

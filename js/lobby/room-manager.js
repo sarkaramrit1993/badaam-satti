@@ -277,7 +277,7 @@ async function loadRoomData(roomCode) {
 }
 
 // Update session leaderboard display
-function updateSessionLeaderboard(leaderboard) {
+async function updateSessionLeaderboard(leaderboard) {
     const standingsList = document.getElementById('standingsList');
     
     if (!leaderboard || Object.keys(leaderboard).length === 0) {
@@ -294,8 +294,27 @@ function updateSessionLeaderboard(leaderboard) {
         }))
         .sort((a, b) => a.totalPoints - b.totalPoints);
     
+    standingsList.innerHTML = '<div class="loading">Loading usernames...</div>';
+    
+    // Fetch all usernames
+    const standingsWithUsernames = await Promise.all(standings.map(async (player) => {
+        let username = player.username;
+        
+        // If username is missing or is "Player", fetch from user profile
+        if (!username || username === 'Player') {
+            username = await getUserUsername(player.uid);
+        }
+        
+        // Fallback to Guest if still no username
+        if (!username || username === 'Player') {
+            username = `Guest_${player.uid.slice(0, 4)}`;
+        }
+        
+        return { ...player, username };
+    }));
+    
     standingsList.innerHTML = '';
-    standings.forEach((player, index) => {
+    standingsWithUsernames.forEach((player, index) => {
         const item = document.createElement('div');
         item.className = `standings-item ${player.uid === currentUser.uid ? 'highlight' : ''}`;
         
@@ -312,9 +331,9 @@ function updateSessionLeaderboard(leaderboard) {
     });
     
     // Update session leader
-    if (standings.length > 0) {
+    if (standingsWithUsernames.length > 0) {
         document.getElementById('sessionLeader').textContent = 
-            `${standings[0].username} (${standings[0].totalPoints} pts)`;
+            `${standingsWithUsernames[0].username} (${standingsWithUsernames[0].totalPoints} pts)`;
     }
 }
 
@@ -874,9 +893,26 @@ async function loadLeaderboardData(type) {
         if (players.length === 0) {
             content.innerHTML = '<p class="no-data">No data available yet</p>';
         } else {
+            // Fetch all usernames
+            const playersWithUsernames = await Promise.all(players.slice(0, 10).map(async (player) => {
+                let username = player.username;
+                
+                // If username is missing or is "Player", fetch from user profile
+                if (!username || username === 'Player') {
+                    username = await getUserUsername(player.uid);
+                }
+                
+                // Fallback to Guest if still no username
+                if (!username || username === 'Player') {
+                    username = `Guest_${player.uid.slice(0, 4)}`;
+                }
+                
+                return { ...player, username };
+            }));
+            
             let html = '<div class="leaderboard-list">';
             
-            players.slice(0, 10).forEach((player, index) => {
+            playersWithUsernames.forEach((player, index) => {
                 const medal = getPositionMedal(index + 1);
                 const isCurrentUser = player.uid === currentUser?.uid;
                 
