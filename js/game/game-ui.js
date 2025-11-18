@@ -138,17 +138,10 @@ function createPlayerCardElement(cardStr, isPlayable) {
         card.style.cursor = 'pointer';
     }
     
+    // Simplified: just rank and suit symbol, no overlapping corners
     card.innerHTML = `
-        <div class="card-corners top-left">
-            <span>${rank}</span>
-            <span>${symbol}</span>
-        </div>
         <div class="card-rank">${rank}</div>
         <div class="card-suit">${symbol}</div>
-        <div class="card-corners bottom-right">
-            <span>${rank}</span>
-            <span>${symbol}</span>
-        </div>
     `;
     
     return card;

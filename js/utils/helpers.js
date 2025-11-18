@@ -64,7 +64,7 @@ function parseCard(cardStr) {
     return { rank, suit };
 }
 
-// Get card display HTML
+// Get card display HTML - simplified: just rank and suit symbol
 function getCardHTML(cardStr) {
     const { rank, suit } = parseCard(cardStr);
     const color = SUIT_COLORS[suit];
@@ -72,16 +72,8 @@ function getCardHTML(cardStr) {
     
     return `
         <div class="card ${color}" data-card="${cardStr}">
-            <div class="card-corners top-left">
-                <span>${rank}</span>
-                <span>${symbol}</span>
-            </div>
             <div class="card-rank">${rank}</div>
             <div class="card-suit">${symbol}</div>
-            <div class="card-corners bottom-right">
-                <span>${rank}</span>
-                <span>${symbol}</span>
-            </div>
         </div>
     `;
 }

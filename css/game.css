@@ -212,13 +212,15 @@
 }
 
 .card-rank {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
+    line-height: 1;
 }
 
 .card-suit {
-    font-size: 2rem;
-    margin-top: 0.25rem;
+    font-size: 2.5rem;
+    margin-top: 0.5rem;
+    line-height: 1;
 }
 
 .card.red .card-rank,
