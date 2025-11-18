@@ -225,16 +225,36 @@ function updatePassButton() {
         return;
     }
     
-    if (!gameState.isMyTurn()) {
+    const isMyTurn = gameState.isMyTurn();
+    
+    if (!isMyTurn) {
         passBtn.disabled = true;
+        passBtn.textContent = 'Pass (Not Your Turn)';
+        passBtn.style.opacity = '0.5';
         return;
     }
     
     const gameData = gameState.getGameData();
     const board = gameData?.board;
-    const canPlay = canMakeAnyMove(gameState.getMyHand(), board);
+    const myHand = gameState.getMyHand();
+    const canPlay = canMakeAnyMove(myHand, board);
     
-    passBtn.disabled = canPlay; // Can only pass if no playable cards
+    console.log('Pass button update - My turn:', isMyTurn, 'Can play:', canPlay);
+    
+    if (canPlay) {
+        // Has playable cards - cannot pass
+        passBtn.disabled = true;
+        passBtn.textContent = 'Pass (You have playable cards)';
+        passBtn.style.opacity = '0.5';
+    } else {
+        // No playable cards - can pass
+        passBtn.disabled = false;
+        passBtn.textContent = 'Pass Turn';
+        passBtn.style.opacity = '1';
+        passBtn.style.background = 'var(--warning-color)';
+        passBtn.style.color = 'white';
+        console.log('✅ Pass button ENABLED - no playable cards!');
+    }
 }
 
 // Update cards remaining display
