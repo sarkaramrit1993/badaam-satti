@@ -389,13 +389,18 @@ async function showSessionUpdate() {
         const leader = standings[0];
         const medal = '🏆';
         
-        // Fetch username properly
-        let username = leader.username;
-        if (!username || username === 'Player') {
-            username = await getUserUsername(leader.uid);
+        // Fetch username properly - always fetch fresh
+        let username = null;
+        try {
+            const userSnapshot = await database.ref(`users/${leader.uid}/username`).once('value');
+            username = userSnapshot.val();
+        } catch (e) {
+            console.log('Error fetching username:', e);
         }
-        if (!username || username === 'Player') {
-            username = `Guest_${leader.uid.slice(0, 4)}`;
+        
+        // If no username or "Player", use Guest
+        if (!username || username === 'Player' || username.trim() === '') {
+            username = `Guest_${leader.uid.slice(0, 4).toUpperCase()}`;
         }
         
         updateContent.innerHTML = `
