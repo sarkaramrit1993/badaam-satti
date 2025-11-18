@@ -251,15 +251,28 @@ function updateGameStatus() {
 
 // Show game over modal
 async function showGameOverModal(rankings) {
+    console.log('🎊 showGameOverModal called with rankings:', rankings);
+    
     const modal = document.getElementById('gameOverModal');
     const resultsContainer = document.getElementById('gameResults');
     
-    if (!modal || !resultsContainer) {
-        console.error('Game over modal elements not found');
+    console.log('Modal element:', modal);
+    console.log('Results container:', resultsContainer);
+    
+    if (!modal) {
+        console.error('gameOverModal not found in DOM!');
+        alert('Game Over! Scores calculated. Please check console for results.');
+        console.log('Rankings:', rankings);
+        return;
+    }
+    
+    if (!resultsContainer) {
+        console.error('gameResults container not found!');
         return;
     }
     
     resultsContainer.innerHTML = '<p>Loading results...</p>';
+    console.log('Loading results...');
     
     // Load all usernames first
     const resultsPromises = rankings.map(async (entry) => {

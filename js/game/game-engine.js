@@ -255,13 +255,34 @@ async function passRound() {
 
 // Handle game over
 async function handleGameOver() {
+    console.log('🎉 handleGameOver called!');
+    
     try {
         const gameData = gameState.getGameData();
+        console.log('Game data:', gameData);
+        
+        if (!gameData || !gameData.hands) {
+            console.error('Missing game data or hands');
+            // Show modal anyway with basic info
+            const players = gameData?.players || {};
+            const rankings = Object.entries(players).map(([uid, p], i) => ({
+                uid,
+                score: p.finalScore || 0,
+                position: i + 1
+            })).sort((a, b) => a.score - b.score);
+            showGameOverModal(rankings);
+            return;
+        }
+        
         const hands = gameData.hands;
+        console.log('Hands:', hands);
         
         // Calculate final scores
         const scores = calculateFinalScores(hands);
+        console.log('Scores calculated:', scores);
+        
         const rankings = getRankings(scores);
+        console.log('Rankings:', rankings);
         
         // Update final scores in database
         const updates = {};
@@ -272,22 +293,26 @@ async function handleGameOver() {
         updates[`rooms/${roomCode}/gameState/finalScores`] = scores;
         
         await database.ref().update(updates);
+        console.log('Final scores updated in database');
         
-        // Update user stats and leaderboard
-        await updateUserStats(rankings);
-        await updateLeaderboards(rankings);
+        // SHOW MODAL FIRST - Don't wait for stats
+        console.log('Showing game over modal NOW...');
+        showGameOverModal(rankings);
+        
+        // Update stats in background (don't block modal)
+        updateUserStats(rankings).catch(err => console.error('Stats update error:', err));
+        updateLeaderboards(rankings).catch(err => console.error('Leaderboard update error:', err));
         
         // Handle session room updates
         const roomData = gameData;
-        if (roomData.metadata.type === 'session') {
-            await updateSessionStats(rankings);
+        if (roomData.metadata && roomData.metadata.type === 'session') {
+            updateSessionStats(rankings).catch(err => console.error('Session stats error:', err));
         }
-        
-        // Show game over modal
-        setTimeout(() => showGameOverModal(rankings), 1000);
         
     } catch (error) {
         console.error('Error handling game over:', error);
+        // Try to show modal anyway
+        showError('Game over! Error calculating scores: ' + error.message);
     }
 }
 
