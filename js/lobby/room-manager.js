@@ -431,40 +431,62 @@ async function startGame() {
             return;
         }
         
-        // Create deck and shuffle
-        let deck = createDeck();
-        deck = shuffleArray(deck);
+        // Create deck and shuffle with fairness check
+        let deck, hands, removedCard = null;
+        const playerIds = activeMembers.map(([uid]) => uid);
+        let reshuffleAttempts = 0;
+        const MAX_RESHUFFLE = 10;
         
-        // Handle 3-player card removal
-        let removedCard = null;
-        if (playerCount === 3) {
-            const removeMethod = document.querySelector('input[name="removeMethod"]:checked').value;
-            if (removeMethod === 'random') {
-                const randomIndex = Math.floor(Math.random() * deck.length);
-                removedCard = deck.splice(randomIndex, 1)[0];
-            } else {
-                removedCard = document.getElementById('cardToRemove').value;
-                if (!removedCard) {
-                    showError('Please select a card to remove for 3-player mode');
-                    return;
-                }
-                const cardIndex = deck.indexOf(removedCard);
-                if (cardIndex !== -1) {
-                    deck.splice(cardIndex, 1);
+        // Keep dealing until we get a fair distribution
+        do {
+            deck = createDeck();
+            deck = shuffleArray(deck);
+            
+            // Handle 3-player card removal
+            if (playerCount === 3) {
+                const removeMethod = document.querySelector('input[name="removeMethod"]:checked').value;
+                if (removeMethod === 'random') {
+                    const randomIndex = Math.floor(Math.random() * deck.length);
+                    removedCard = deck.splice(randomIndex, 1)[0];
+                } else {
+                    removedCard = document.getElementById('cardToRemove').value;
+                    if (!removedCard) {
+                        showError('Please select a card to remove for 3-player mode');
+                        return;
+                    }
+                    const cardIndex = deck.indexOf(removedCard);
+                    if (cardIndex !== -1) {
+                        deck.splice(cardIndex, 1);
+                    }
                 }
             }
+            
+            // Deal cards
+            const cardsPerPlayer = Math.floor(deck.length / playerCount);
+            hands = {};
+            
+            playerIds.forEach((uid, index) => {
+                const startIndex = index * cardsPerPlayer;
+                const hand = deck.slice(startIndex, startIndex + cardsPerPlayer);
+                hands[uid] = sortCards(hand);
+            });
+            
+            reshuffleAttempts++;
+            
+            // Check if distribution is fair
+            const isFair = checkFairDistribution(hands);
+            if (isFair) {
+                console.log('Fair distribution achieved!');
+                break;
+            } else {
+                console.log(`Unfair distribution, reshuffling... (attempt ${reshuffleAttempts})`);
+            }
+            
+        } while (reshuffleAttempts < MAX_RESHUFFLE);
+        
+        if (reshuffleAttempts >= MAX_RESHUFFLE) {
+            console.warn('Max reshuffles reached, using current distribution');
         }
-        
-        // Deal cards
-        const cardsPerPlayer = Math.floor(deck.length / playerCount);
-        const hands = {};
-        const playerIds = activeMembers.map(([uid]) => uid);
-        
-        playerIds.forEach((uid, index) => {
-            const startIndex = index * cardsPerPlayer;
-            const hand = deck.slice(startIndex, startIndex + cardsPerPlayer);
-            hands[uid] = sortCards(hand);
-        });
         
         // Determine first player (who has 7H)
         let firstPlayer = null;
@@ -569,6 +591,56 @@ function createEmptyBoard() {
         diamonds: { seven: false, sequence: [], up: [], down: [] },
         clubs: { seven: false, sequence: [], up: [], down: [] }
     };
+}
+
+// Check if card distribution is fair
+function checkFairDistribution(hands) {
+    for (const [uid, hand] of Object.entries(hands)) {
+        // Count kings in hand
+        const kingsCount = hand.filter(card => card.startsWith('K')).length;
+        
+        // Unfair if 3 or more kings (very hard to play)
+        if (kingsCount >= 3) {
+            console.log(`Unfair: Player has ${kingsCount} kings`);
+            return false;
+        }
+        
+        // Count aces (also hard to play)
+        const acesCount = hand.filter(card => card.startsWith('A')).length;
+        
+        // Unfair if 3 or more aces
+        if (acesCount >= 3) {
+            console.log(`Unfair: Player has ${acesCount} aces`);
+            return false;
+        }
+        
+        // Count high cards (K, Q, J) - generally harder to play
+        const highCards = hand.filter(card => {
+            const rank = card.slice(0, -1);
+            return rank === 'K' || rank === 'Q' || rank === 'J';
+        }).length;
+        
+        // Very unfair if more than 8 high cards (out of 13)
+        if (highCards >= 9) {
+            console.log(`Unfair: Player has ${highCards} high cards (K,Q,J)`);
+            return false;
+        }
+        
+        // Count 7s - having 0 sevens can be challenging
+        const sevensCount = hand.filter(card => card.startsWith('7')).length;
+        
+        // Check if no one got 7H
+        const has7H = Object.values(hands).some(h => h.includes('7H'));
+        if (!has7H) {
+            console.log('Unfair: No player has 7♥');
+            return false;
+        }
+        
+        // Fair distribution
+    }
+    
+    console.log('Distribution is fair!');
+    return true;
 }
 
 async function checkIfHost(roomCode) {

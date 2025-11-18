@@ -390,24 +390,71 @@ async function updateSessionStats(rankings) {
 
 // Check if game is over
 function checkGameOver(gameStateData) {
-    if (gameStateData.finished && !gameStateData.gameOverHandled) {
-        console.log('Game over detected, handling...');
-        // Mark as handled to prevent multiple calls
-        database.ref(`rooms/${roomCode}/gameState/gameOverHandled`).set(true);
-        handleGameOver();
+    if (!gameStateData) return;
+    
+    if (gameStateData.finished) {
+        console.log('Game over detected! Finished:', gameStateData.finished, 'Winner:', gameStateData.winner);
+        
+        // Only handle once per client
+        if (!gameStateData.gameOverHandled && !window.gameOverProcessed) {
+            console.log('Handling game over for the first time...');
+            window.gameOverProcessed = true;
+            
+            // Mark as handled in database
+            database.ref(`rooms/${roomCode}/gameState/gameOverHandled`).set(true);
+            
+            // Small delay to ensure all data is synced
+            setTimeout(() => {
+                handleGameOver();
+            }, 500);
+        }
+        
+        // Show leave button more prominently
+        const leaveBtn = document.querySelector('.btn-leave-game');
+        if (leaveBtn) {
+            leaveBtn.textContent = 'Exit Game';
+            leaveBtn.style.background = 'var(--success-color)';
+        }
     }
 }
 
 // Leave game
-function leaveGame() {
+async function leaveGame() {
+    const gameData = gameState?.getGameData();
+    const isFinished = gameData?.gameState?.finished;
+    
+    // If game is finished, just leave without confirmation
+    if (isFinished) {
+        if (gameState) {
+            gameState.cleanup();
+        }
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Otherwise ask for confirmation
     const confirmLeave = confirm('Are you sure you want to leave the game?');
     if (!confirmLeave) return;
     
-    if (gameState) {
-        gameState.cleanup();
+    try {
+        // Mark player as inactive
+        if (currentUser && currentRoom) {
+            await database.ref(`rooms/${currentRoom}/members/${currentUser.uid}/isActive`).set(false);
+        }
+        
+        if (gameState) {
+            gameState.cleanup();
+        }
+        
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Error leaving game:', error);
+        // Force leave anyway
+        if (gameState) {
+            gameState.cleanup();
+        }
+        window.location.href = 'index.html';
     }
-    
-    window.location.href = 'index.html';
 }
 
 // View stats (from game over modal)
