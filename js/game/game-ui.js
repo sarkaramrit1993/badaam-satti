@@ -308,9 +308,10 @@ async function showGameOverModal(rankings) {
             username = await getUserUsername(entry.uid);
         }
         
-        // Fallback to "Guest" if still no username
-        if (!username || username === 'Player') {
-            username = `Guest_${entry.uid.slice(0, 4)}`;
+        // Ensure username exists (getUserUsername should have created it)
+        if (!username) {
+            console.error(`Failed to get username for ${entry.uid}`);
+            username = `User_${entry.uid.slice(0, 6)}`;
         }
         
         const resultItem = document.createElement('div');
@@ -389,18 +390,13 @@ async function showSessionUpdate() {
         const leader = standings[0];
         const medal = '🏆';
         
-        // Fetch username properly - always fetch fresh
-        let username = null;
-        try {
-            const userSnapshot = await database.ref(`users/${leader.uid}/username`).once('value');
-            username = userSnapshot.val();
-        } catch (e) {
-            console.log('Error fetching username:', e);
-        }
+        // Fetch username - ensure it exists
+        let username = await getUserUsername(leader.uid);
         
-        // If no username or "Player", use Guest
-        if (!username || username === 'Player' || username.trim() === '') {
-            username = `Guest_${leader.uid.slice(0, 4).toUpperCase()}`;
+        // If still null, something went wrong - log it
+        if (!username) {
+            console.error(`Failed to get username for ${leader.uid}`);
+            username = `User_${leader.uid.slice(0, 6)}`;
         }
         
         updateContent.innerHTML = `

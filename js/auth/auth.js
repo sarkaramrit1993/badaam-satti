@@ -110,7 +110,8 @@ async function resetPassword() {
 
 // Create user profile in database
 async function createUserProfile(user) {
-    const username = user.email ? user.email.split('@')[0] : `Player_${generateRoomCode(4)}`;
+    // Always generate a proper username (never 'Player')
+    let username = user.email ? user.email.split('@')[0] : `User_${generateRoomCode(6)}`;
     
     const profile = {
         email: user.email || null,
@@ -178,17 +179,33 @@ async function updateUserProfile(user) {
     }
 }
 
-// Get user username
+// Get user username - ensures username exists
 async function getUserUsername(userId = null) {
     const uid = userId || currentUser?.uid;
-    if (!uid) return 'Unknown';
+    if (!uid) {
+        console.error('getUserUsername: No UID provided');
+        return null;
+    }
     
     try {
         const snapshot = await database.ref(`users/${uid}/username`).once('value');
-        return snapshot.val() || 'Player';
+        let username = snapshot.val();
+        
+        // If username doesn't exist or is 'Player', create one
+        if (!username || username === 'Player' || username.trim() === '') {
+            console.log(`Username missing for ${uid}, creating one...`);
+            username = `User_${generateRoomCode(6)}`;
+            
+            // Update user profile with new username
+            await database.ref(`users/${uid}/username`).set(username);
+            console.log(`Created username: ${username} for ${uid}`);
+        }
+        
+        return username;
     } catch (error) {
         console.error('Error getting username:', error);
-        return 'Player';
+        // Don't return 'Player', return null and let caller handle it
+        return null;
     }
 }
 

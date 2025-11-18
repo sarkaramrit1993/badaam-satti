@@ -381,7 +381,13 @@ async function updateUserStats(rankings) {
 // Update leaderboards
 async function updateLeaderboards(rankings) {
     const winner = rankings[0];
-    const username = await getUserUsername(winner.uid);
+    // Ensure username exists (getUserUsername will create it if missing)
+    let username = await getUserUsername(winner.uid);
+    if (!username) {
+        console.error(`Failed to get username for winner ${winner.uid}`);
+        username = `User_${winner.uid.slice(0, 6)}`;
+        await database.ref(`users/${winner.uid}/username`).set(username);
+    }
     
     const dateStr = getCurrentDateString();
     const weekStr = getCurrentWeekString();

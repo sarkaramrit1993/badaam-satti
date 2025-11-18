@@ -176,8 +176,14 @@ async function joinRoom() {
             await database.ref(`rooms/${roomCode}/members/${currentUser.uid}/isActive`).set(true);
             await database.ref(`rooms/${roomCode}/members/${currentUser.uid}/rejoinedAt`).set(firebase.database.ServerValue.TIMESTAMP);
         } else {
-            // Add as new member
-            const username = await getUserUsername();
+            // Add as new member - ensure username exists
+            let username = await getUserUsername();
+            if (!username) {
+                // If getUserUsername returns null, create a proper username
+                username = `User_${generateRoomCode(6)}`;
+                await database.ref(`users/${currentUser.uid}/username`).set(username);
+            }
+            
             const memberData = {
                 username,
                 joinedAt: firebase.database.ServerValue.TIMESTAMP,
@@ -296,20 +302,15 @@ async function updateSessionLeaderboard(leaderboard) {
     
     standingsList.innerHTML = '<div class="loading">Loading usernames...</div>';
     
-    // ALWAYS fetch fresh usernames (don't trust stored username)
+    // Fetch usernames - ensure they exist
     const standingsWithUsernames = await Promise.all(standings.map(async (player) => {
-        // Try to get username from user profile directly
-        let username = null;
-        try {
-            const userSnapshot = await database.ref(`users/${player.uid}/username`).once('value');
-            username = userSnapshot.val();
-        } catch (e) {
-            console.log('Error fetching username:', e);
-        }
+        // Use getUserUsername which ensures username exists
+        let username = await getUserUsername(player.uid);
         
-        // If no username or "Player", use Guest
-        if (!username || username === 'Player' || username.trim() === '') {
-            username = `Guest_${player.uid.slice(0, 4).toUpperCase()}`;
+        // If still null, something went wrong - log it
+        if (!username) {
+            console.error(`Failed to get username for ${player.uid}`);
+            username = `User_${player.uid.slice(0, 6)}`;
         }
         
         return { ...player, username };
@@ -895,20 +896,15 @@ async function loadLeaderboardData(type) {
         if (players.length === 0) {
             content.innerHTML = '<p class="no-data">No data available yet</p>';
         } else {
-            // ALWAYS fetch fresh usernames (don't trust stored username)
+            // Fetch usernames - ensure they exist
             const playersWithUsernames = await Promise.all(players.slice(0, 10).map(async (player) => {
-                // Try to get username from user profile
-                let username = null;
-                try {
-                    const userSnapshot = await database.ref(`users/${player.uid}/username`).once('value');
-                    username = userSnapshot.val();
-                } catch (e) {
-                    console.log('Error fetching username:', e);
-                }
+                // Use getUserUsername which ensures username exists
+                let username = await getUserUsername(player.uid);
                 
-                // If no username or "Player", use Guest
-                if (!username || username === 'Player' || username.trim() === '') {
-                    username = `Guest_${player.uid.slice(0, 4).toUpperCase()}`;
+                // If still null, something went wrong - log it
+                if (!username) {
+                    console.error(`Failed to get username for ${player.uid}`);
+                    username = `User_${player.uid.slice(0, 6)}`;
                 }
                 
                 return { ...player, username };
