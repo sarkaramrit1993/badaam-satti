@@ -250,13 +250,19 @@ function updateGameStatus() {
 }
 
 // Show game over modal
-function showGameOverModal(rankings) {
+async function showGameOverModal(rankings) {
     const modal = document.getElementById('gameOverModal');
     const resultsContainer = document.getElementById('gameResults');
     
-    resultsContainer.innerHTML = '';
+    if (!modal || !resultsContainer) {
+        console.error('Game over modal elements not found');
+        return;
+    }
     
-    rankings.forEach(async (entry) => {
+    resultsContainer.innerHTML = '<p>Loading results...</p>';
+    
+    // Load all usernames first
+    const resultsPromises = rankings.map(async (entry) => {
         const username = await getUserUsername(entry.uid);
         const resultItem = document.createElement('div');
         resultItem.className = `result-item ${entry.position === 1 ? 'winner' : ''}`;
@@ -269,19 +275,30 @@ function showGameOverModal(rankings) {
             <span class="score">${formatScore(entry.score)}</span>
         `;
         
-        resultsContainer.appendChild(resultItem);
+        return resultItem;
     });
+    
+    // Wait for all results to be ready
+    const resultElements = await Promise.all(resultsPromises);
+    
+    // Clear and populate results
+    resultsContainer.innerHTML = '';
+    resultElements.forEach(elem => resultsContainer.appendChild(elem));
     
     // Check if session room and show session update
     const gameData = gameState.getGameData();
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    
     if (gameData.metadata.type === 'session') {
+        if (playAgainBtn) playAgainBtn.style.display = 'block';
         showSessionUpdate();
     } else {
         // Hide play again button for single games
-        document.getElementById('playAgainBtn').style.display = 'none';
+        if (playAgainBtn) playAgainBtn.style.display = 'none';
     }
     
     modal.classList.remove('hidden');
+    console.log('Game over modal displayed with', rankings.length, 'players');
 }
 
 // Show session update in game over modal

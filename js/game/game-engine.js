@@ -167,12 +167,16 @@ async function playCardAction(card) {
         if (newHand.length === 0) {
             updates[`rooms/${roomCode}/gameState/finished`] = true;
             updates[`rooms/${roomCode}/gameState/winner`] = currentUser.uid;
-            
-            // Calculate final scores
-            await handleGameOver();
         }
         
+        // Update database first
         await database.ref().update(updates);
+        
+        // Then handle game over if finished
+        if (newHand.length === 0) {
+            console.log('Game finished! Calculating scores...');
+            await handleGameOver();
+        }
         
         showSuccess('Card played!');
         
@@ -383,8 +387,11 @@ async function updateSessionStats(rankings) {
 
 // Check if game is over
 function checkGameOver(gameStateData) {
-    if (gameStateData.finished) {
-        // Game is over, modal will be shown by handleGameOver
+    if (gameStateData.finished && !gameStateData.gameOverHandled) {
+        console.log('Game over detected, handling...');
+        // Mark as handled to prevent multiple calls
+        database.ref(`rooms/${roomCode}/gameState/gameOverHandled`).set(true);
+        handleGameOver();
     }
 }
 
@@ -397,6 +404,20 @@ function leaveGame() {
         gameState.cleanup();
     }
     
+    window.location.href = 'index.html';
+}
+
+// View stats (from game over modal)
+function viewStats() {
+    // TODO: Implement detailed stats view
+    showSuccess('Stats feature coming soon!');
+}
+
+// Return to lobby (from game over modal)
+function returnToLobby() {
+    if (gameState) {
+        gameState.cleanup();
+    }
     window.location.href = 'index.html';
 }
 
