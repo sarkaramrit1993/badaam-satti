@@ -275,10 +275,25 @@ async function handleGameOver() {
         }
         
         const hands = gameData.hands;
+        const players = gameData.players;
+        const winner = gameData.gameState.winner;
+        
         console.log('Hands:', hands);
+        console.log('Players:', players);
+        console.log('Winner:', winner);
         
         // Calculate final scores
-        const scores = calculateFinalScores(hands);
+        const scores = {};
+        for (const uid in players) {
+            if (uid === winner) {
+                // Winner has 0 points (played all cards)
+                scores[uid] = 0;
+            } else {
+                // Calculate points from remaining cards
+                const hand = hands[uid]?.cards || hands[uid] || [];
+                scores[uid] = calculatePoints(hand);
+            }
+        }
         console.log('Scores calculated:', scores);
         
         const rankings = getRankings(scores);
