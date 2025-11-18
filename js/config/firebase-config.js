@@ -39,18 +39,24 @@ auth.onAuthStateChanged((user) => {
 
 // Handle user logged in
 function onUserLoggedIn() {
-    hideAllSections();
+    if (typeof hideAllSections === 'function') {
+        hideAllSections();
+    }
     const lobbySection = document.getElementById('lobbySection');
     if (lobbySection) {
         lobbySection.classList.remove('hidden');
         updateUserInfo();
-        loadActiveRooms();
+        if (typeof loadActiveRooms === 'function') {
+            loadActiveRooms();
+        }
     }
 }
 
 // Handle user logged out
 function onUserLoggedOut() {
-    hideAllSections();
+    if (typeof hideAllSections === 'function') {
+        hideAllSections();
+    }
     const authSection = document.getElementById('authSection');
     if (authSection) {
         authSection.classList.remove('hidden');
@@ -97,8 +103,10 @@ async function logout() {
 
 // Check browser support on load
 window.addEventListener('load', () => {
-    if (!checkBrowserSupport()) {
-        showError('Your browser may not support all features of this game');
+    if (typeof checkBrowserSupport === 'function' && !checkBrowserSupport()) {
+        if (typeof showError === 'function') {
+            showError('Your browser may not support all features of this game');
+        }
     }
 });
 
@@ -109,7 +117,9 @@ connectedRef.on('value', (snapshot) => {
         console.log('Connected to Firebase');
     } else {
         console.log('Disconnected from Firebase');
-        showWarning('Connection lost. Reconnecting...');
+        if (typeof showWarning === 'function') {
+            showWarning('Connection lost. Reconnecting...');
+        }
     }
 });
 
