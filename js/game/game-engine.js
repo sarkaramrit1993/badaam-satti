@@ -180,6 +180,22 @@ async function playCardAction(card) {
         if (newHand.length === 0) {
             updates[`rooms/${roomCode}/gameState/finished`] = true;
             updates[`rooms/${roomCode}/gameState/winner`] = currentUser.uid;
+            
+            // SAVE SNAPSHOT of all hands at game finish moment (for accurate scoring)
+            const handsSnapshot = {};
+            const allHands = await database.ref(`rooms/${roomCode}/hands`).once('value');
+            const handsData = allHands.val() || {};
+            
+            for (const uid in handsData) {
+                handsSnapshot[uid] = {
+                    cards: handsData[uid].cards || handsData[uid] || [],
+                    cardsCount: (handsData[uid].cards || handsData[uid] || []).length
+                };
+            }
+            
+            // Save the snapshot for score calculation
+            updates[`rooms/${roomCode}/gameState/finalHandsSnapshot`] = handsSnapshot;
+            console.log('Game finished! Saved hand snapshot:', handsSnapshot);
         }
         
         // Update database first
@@ -187,7 +203,7 @@ async function playCardAction(card) {
         
         // Then handle game over if finished
         if (newHand.length === 0) {
-            console.log('Game finished! Calculating scores...');
+            console.log('Triggering game over handling...');
             await handleGameOver();
         }
         
@@ -274,18 +290,17 @@ async function handleGameOver() {
             return;
         }
         
-        // Reload fresh hands data from Firebase (not cached)
-        const handsSnapshot = await database.ref(`rooms/${roomCode}/hands`).once('value');
-        const hands = handsSnapshot.val() || {};
+        // Use the SNAPSHOT saved at game finish moment (most accurate!)
+        const finalHandsSnapshot = gameData.gameState.finalHandsSnapshot;
         
         const players = gameData.players;
         const winner = gameData.gameState.winner;
         
-        console.log('Fresh hands from Firebase:', hands);
+        console.log('Using hand snapshot from game finish:', finalHandsSnapshot);
         console.log('Players:', players);
         console.log('Winner:', winner);
         
-        // Calculate final scores
+        // Calculate final scores from snapshot
         const scores = {};
         for (const uid in players) {
             if (uid === winner) {
@@ -293,8 +308,8 @@ async function handleGameOver() {
                 scores[uid] = 0;
                 console.log(`${uid} (winner): 0 points`);
             } else {
-                // Calculate points from remaining cards
-                const hand = hands[uid]?.cards || hands[uid] || [];
+                // Calculate points from snapshot of remaining cards
+                const hand = finalHandsSnapshot?.[uid]?.cards || [];
                 const points = calculatePoints(hand);
                 scores[uid] = points;
                 console.log(`${uid}: ${hand.length} cards = ${points} points (${hand.join(', ')})`);
