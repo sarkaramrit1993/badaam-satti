@@ -274,11 +274,14 @@ async function handleGameOver() {
             return;
         }
         
-        const hands = gameData.hands;
+        // Reload fresh hands data from Firebase (not cached)
+        const handsSnapshot = await database.ref(`rooms/${roomCode}/hands`).once('value');
+        const hands = handsSnapshot.val() || {};
+        
         const players = gameData.players;
         const winner = gameData.gameState.winner;
         
-        console.log('Hands:', hands);
+        console.log('Fresh hands from Firebase:', hands);
         console.log('Players:', players);
         console.log('Winner:', winner);
         
@@ -288,13 +291,16 @@ async function handleGameOver() {
             if (uid === winner) {
                 // Winner has 0 points (played all cards)
                 scores[uid] = 0;
+                console.log(`${uid} (winner): 0 points`);
             } else {
                 // Calculate points from remaining cards
                 const hand = hands[uid]?.cards || hands[uid] || [];
-                scores[uid] = calculatePoints(hand);
+                const points = calculatePoints(hand);
+                scores[uid] = points;
+                console.log(`${uid}: ${hand.length} cards = ${points} points (${hand.join(', ')})`);
             }
         }
-        console.log('Scores calculated:', scores);
+        console.log('Final scores calculated:', scores);
         
         const rankings = getRankings(scores);
         console.log('Rankings:', rankings);
