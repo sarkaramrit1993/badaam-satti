@@ -24,20 +24,27 @@ function canPlayCard(card, board) {
         down: suitBoard.down || []
     };
     
+    // Check if game has started (7H must be played first)
+    const gameStarted = Object.values(board).some(s => {
+        if (!s) return false;
+        const normalized = {
+            seven: s.seven || false,
+            sequence: s.sequence || [],
+            up: s.up || [],
+            down: s.down || []
+        };
+        return normalized.seven || normalized.sequence.length > 0;
+    });
+    
     // Special case: 7H starts the game (must be first card)
     if (card === '7H') {
-        // Can play 7H if no cards have been played yet
-        const noCardsPlayed = Object.values(board).every(s => {
-            if (!s) return true;
-            const normalized = {
-                seven: s.seven || false,
-                sequence: s.sequence || [],
-                up: s.up || [],
-                down: s.down || []
-            };
-            return !normalized.seven && normalized.sequence.length === 0;
-        });
-        return noCardsPlayed;
+        // Can play 7H ONLY if no cards have been played yet
+        return !gameStarted;
+    }
+    
+    // If game hasn't started, ONLY 7H can be played
+    if (!gameStarted) {
+        return false;
     }
     
     // Check if this is a 7 (opens a new suit)
