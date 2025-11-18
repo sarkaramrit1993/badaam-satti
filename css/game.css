@@ -487,3 +487,121 @@
 
 /* Mobile optimizations in mobile.css */
 
+
+/* Activity Feed */
+.activity-feed {
+    position: fixed;
+    top: 70px;
+    right: 1rem;
+    width: 320px;
+    max-height: 400px;
+    background: var(--surface);
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.activity-feed.hidden {
+    display: none;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--primary-color);
+    border-bottom: 2px solid var(--primary-dark);
+}
+
+.activity-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.btn-close {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+}
+
+.btn-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.activity-list {
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.activity-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--surface-light);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.activity-item:last-child {
+    margin-bottom: 0;
+}
+
+.activity-item.play-action {
+    border-left-color: var(--success-color);
+}
+
+.activity-item.pass-action {
+    border-left-color: var(--warning-color);
+}
+
+.activity-player {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.activity-action {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.no-activity {
+    text-align: center;
+    color: #64748b;
+    padding: 2rem 1rem;
+    font-style: italic;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}

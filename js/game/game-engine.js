@@ -42,6 +42,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         // Initialize UI
         initializeGameUI();
         
+        // Initialize activity feed
+        initActivityFeed();
+        
         showLoading(false);
         
     } catch (error) {

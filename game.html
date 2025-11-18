@@ -10,9 +10,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <link rel="stylesheet" href="css/styles.css?v=2.0">
-    <link rel="stylesheet" href="css/game.css?v=2.0">
-    <link rel="stylesheet" href="css/mobile.css?v=2.0">
+    <link rel="stylesheet" href="css/styles.css?v=2.6">
+    <link rel="stylesheet" href="css/game.css?v=2.6">
+    <link rel="stylesheet" href="css/mobile.css?v=2.6">
 </head>
 <body>
     <div class="game-container">
@@ -23,8 +23,22 @@
                 <button onclick="copyRoomCode()" class="btn-copy-small" title="Copy room code">📋</button>
             </div>
             <div class="turn-indicator" id="turnIndicator">Waiting...</div>
-            <button onclick="leaveGame()" class="btn-leave-game">Leave Game</button>
+            <div class="header-actions">
+                <button onclick="toggleActivityFeed()" class="btn-copy-small" id="activityToggle" title="Activity Feed">📜</button>
+                <button onclick="leaveGame()" class="btn-leave-game">Leave Game</button>
+            </div>
         </header>
+        
+        <!-- Activity Feed -->
+        <div id="activityFeed" class="activity-feed hidden">
+            <div class="activity-header">
+                <h3>Recent Activity</h3>
+                <button onclick="toggleActivityFeed()" class="btn-close">✕</button>
+            </div>
+            <div id="activityList" class="activity-list">
+                <p class="no-activity">No moves yet...</p>
+            </div>
+        </div>
 
         <!-- Game Board -->
         <main class="game-board">
@@ -133,13 +147,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     
     <!-- Game Scripts -->
-    <script src="js/utils/constants.js?v=2.5"></script>
-    <script src="js/utils/helpers.js?v=2.5"></script>
-    <script src="js/config/firebase-config.js?v=2.5"></script>
-    <script src="js/game/card-logic.js?v=2.5"></script>
-    <script src="js/game/game-state.js?v=2.5"></script>
-    <script src="js/game/game-engine.js?v=2.5"></script>
-    <script src="js/game/game-ui.js?v=2.5"></script>
+    <script src="js/utils/constants.js?v=2.6"></script>
+    <script src="js/utils/helpers.js?v=2.6"></script>
+    <script src="js/config/firebase-config.js?v=2.6"></script>
+    <script src="js/game/card-logic.js?v=2.6"></script>
+    <script src="js/game/game-state.js?v=2.6"></script>
+    <script src="js/game/activity-feed.js?v=2.6"></script>
+    <script src="js/game/game-engine.js?v=2.6"></script>
+    <script src="js/game/game-ui.js?v=2.6"></script>
 </body>
 </html>
 

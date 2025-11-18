@@ -248,26 +248,139 @@
     }
 }
 
-/* Landscape Mobile */
+/* Landscape Mobile - Enhanced */
 @media (max-width: 896px) and (orientation: landscape) {
-    .game-board {
-        overflow-y: scroll;
+    body {
+        overflow: hidden;
     }
     
+    .game-container {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .game-header {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .turn-indicator {
+        font-size: 0.95rem;
+        padding: 0.4rem 1rem;
+    }
+    
+    .game-board {
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    /* Opponents compact on left */
     .opponents-area {
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 0.25rem;
+        overflow-y: auto;
     }
     
     .opponent {
-        min-width: 140px;
-        flex: 1;
+        min-width: auto;
+        padding: 0.5rem;
+    }
+    
+    .opponent-cards {
+        flex-wrap: wrap;
+    }
+    
+    .card-back {
+        width: 30px;
+        height: 45px;
+    }
+    
+    /* Playing area on right with hand at bottom */
+    .game-play-area {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
     
     .playing-area {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         height: auto;
+        gap: 0.25rem;
+        flex: 1;
+    }
+    
+    .suit-area {
+        padding: 0.5rem;
+        min-height: 80px;
+    }
+    
+    .suit-label {
+        font-size: 0.85rem;
+    }
+    
+    .cards-sequence {
+        min-height: 60px;
+        gap: 0.2rem;
+    }
+    
+    /* Cards smaller in landscape */
+    .card {
+        width: 45px;
+        height: 65px;
+    }
+    
+    .card-rank {
+        font-size: 1rem;
+    }
+    
+    .card-suit {
+        font-size: 1.2rem;
+    }
+    
+    .card-corners {
+        font-size: 0.6rem;
+    }
+    
+    /* Player hand compact */
+    .player-hand {
+        padding: 0.5rem;
+        max-height: 110px;
+    }
+    
+    .player-hand .cards-container {
+        gap: 0.2rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .cards-remaining {
+        font-size: 0.85rem;
+    }
+    
+    /* Controls inline */
+    .game-controls {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .btn-pass {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Activity feed overlay for landscape */
+    .activity-feed {
+        top: 50px;
+        right: 0.5rem;
+        width: 280px;
+        max-height: 50vh;
     }
 }
 
