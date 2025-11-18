@@ -59,7 +59,6 @@ async function createRoom() {
         if (!username) {
             username = currentUser.email ? currentUser.email.split('@')[0] : `User_${generateRoomCode(6)}`;
             await database.ref(`users/${currentUser.uid}/username`).set(username);
-            console.log(`Created persistent username: ${username} for ${currentUser.uid}`);
         }
         
         // Room settings
@@ -514,17 +513,12 @@ async function startGame() {
             // Check if distribution is fair
             const isFair = checkFairDistribution(hands);
             if (isFair) {
-                console.log('Fair distribution achieved!');
                 break;
-            } else {
-                console.log(`Unfair distribution, reshuffling... (attempt ${reshuffleAttempts})`);
             }
             
         } while (reshuffleAttempts < MAX_RESHUFFLE);
         
-        if (reshuffleAttempts >= MAX_RESHUFFLE) {
-            console.warn('Max reshuffles reached, using current distribution');
-        }
+        // Max reshuffles reached, use current distribution
         
         // Determine first player (who has 7H)
         let firstPlayer = null;
@@ -646,7 +640,6 @@ function checkFairDistribution(hands) {
         
         // Unfair if 3 or more kings (very hard to play)
         if (kingsCount >= 3) {
-            console.log(`Unfair: Player has ${kingsCount} kings`);
             return false;
         }
         
@@ -655,7 +648,6 @@ function checkFairDistribution(hands) {
         
         // Unfair if 3 or more aces
         if (acesCount >= 3) {
-            console.log(`Unfair: Player has ${acesCount} aces`);
             return false;
         }
         
@@ -667,7 +659,6 @@ function checkFairDistribution(hands) {
         
         // Very unfair if more than 8 high cards (out of 13)
         if (highCards >= 9) {
-            console.log(`Unfair: Player has ${highCards} high cards (K,Q,J)`);
             return false;
         }
         
@@ -677,7 +668,6 @@ function checkFairDistribution(hands) {
         // Check if no one got 7H
         const has7H = Object.values(hands).some(h => h.includes('7H'));
         if (!has7H) {
-            console.log('Unfair: No player has 7♥');
             return false;
         }
         

@@ -195,20 +195,42 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* Recently played card highlight (by other players) */
+.card.recently-played {
+    border-color: var(--warning-color);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+    animation: pulse-highlight 1s ease-in-out;
+}
+
+@keyframes pulse-highlight {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(245, 158, 11, 1);
+    }
+}
+
+/* Hover highlight when hovering over activity feed card */
+.card.hover-highlight {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 25px rgba(37, 99, 235, 0.9);
+    transform: translateY(-10px) scale(1.1);
+    z-index: 10;
+    transition: all 0.2s;
+}
+
+/* Playable card highlighting (optional feature) */
 .card.playable {
     border-color: var(--success-color);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-    cursor: pointer;
 }
 
 .card.playable:hover {
     transform: translateY(-12px);
     box-shadow: 0 8px 16px rgba(16, 185, 129, 0.6);
-}
-
-.card.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 
 .card-rank {
@@ -568,6 +590,30 @@
 .activity-action {
     font-size: 0.9rem;
     color: #cbd5e1;
+}
+
+.activity-card {
+    display: inline-block;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.activity-card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.activity-card.red {
+    color: var(--red-suit);
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.activity-card.black {
+    color: #1f2937;
+    background: rgba(31, 41, 55, 0.1);
 }
 
 .activity-time {

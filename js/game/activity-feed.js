@@ -5,8 +5,6 @@ const MAX_ACTIVITIES = 10;
 
 // Initialize activity feed listeners
 function initActivityFeed() {
-    console.log('Initializing activity feed for room:', roomCode);
-    
     // Listen to activity history in Firebase
     database.ref(`rooms/${roomCode}/activityHistory`)
         .limitToLast(MAX_ACTIVITIES)
@@ -22,7 +20,6 @@ function initActivityFeed() {
                 }
                 
                 renderActivityFeed();
-                console.log('Activity added:', action.type, action.card || '');
             }
         });
     
@@ -46,7 +43,6 @@ async function loadActivityHistory() {
             });
             activityLog = activities;
             renderActivityFeed();
-            console.log('Loaded', activityLog.length, 'activities');
         }
     } catch (error) {
         console.error('Error loading activity history:', error);
@@ -110,7 +106,13 @@ async function createActivityItem(activity) {
     if (activity.type === 'play') {
         const { rank, suit } = parseCard(activity.card);
         const symbol = SUIT_SYMBOLS[suit];
-        actionText = `played <strong>${rank}${symbol}</strong>`;
+        const color = SUIT_COLORS[suit];
+        // Add hover effect for cards played by other players
+        if (activity.player !== currentUser.uid) {
+            actionText = `played <span class="activity-card ${color}" data-card="${activity.card}" title="Hover to see on board">${rank}${symbol}</span>`;
+        } else {
+            actionText = `played <strong>${rank}${symbol}</strong>`;
+        }
     } else if (activity.type === 'pass') {
         actionText = 'passed their turn';
     } else {
@@ -125,6 +127,19 @@ async function createActivityItem(activity) {
         <div class="activity-action">${actionText}</div>
         <div class="activity-time">${timeAgo}</div>
     `;
+    
+    // Add hover effect for cards played by others
+    if (activity.type === 'play' && activity.player !== currentUser.uid) {
+        const cardElement = item.querySelector('.activity-card');
+        if (cardElement) {
+            cardElement.addEventListener('mouseenter', () => {
+                highlightCardOnBoard(activity.card);
+            });
+            cardElement.addEventListener('mouseleave', () => {
+                clearCardHighlight();
+            });
+        }
+    }
     
     return item;
 }
@@ -175,5 +190,24 @@ function toggleActivityFeed() {
 function clearActivityFeed() {
     activityLog = [];
     renderActivityFeed();
+}
+
+// Highlight a card on the board when hovering in activity feed
+function highlightCardOnBoard(cardStr) {
+    // Find the card on the board by data attribute
+    const cards = document.querySelectorAll('.card[data-card]');
+    cards.forEach(card => {
+        if (card.dataset.card === cardStr) {
+            card.classList.add('hover-highlight');
+        }
+    });
+}
+
+// Clear card highlight
+function clearCardHighlight() {
+    const highlightedCards = document.querySelectorAll('.card.hover-highlight');
+    highlightedCards.forEach(card => {
+        card.classList.remove('hover-highlight');
+    });
 }
 

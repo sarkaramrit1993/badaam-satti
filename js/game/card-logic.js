@@ -47,23 +47,18 @@ function canPlayCard(card, board) {
     // Special case: 7H starts the game (must be first card)
     if (card === '7H') {
         // Can play 7H ONLY if no cards have been played yet
-        const canPlay = !gameStarted;
-        console.log(`Checking 7H: gameStarted=${gameStarted}, canPlay=${canPlay}`);
-        return canPlay;
+        return !gameStarted;
     }
     
     // If game hasn't started, ONLY 7H can be played
     if (!gameStarted) {
-        console.log(`Game not started yet, blocking ${card} (only 7H allowed)`);
         return false;
     }
     
     // Check if this is a 7 (opens a new suit)
     if (rank === '7') {
         // Can play a 7 if that suit hasn't been opened yet
-        const canPlay = !normalizedSuit.seven;
-        console.log(`Checking ${card}: suit ${suitName} is ${normalizedSuit.seven ? 'opened' : 'closed'}, canPlay: ${canPlay}`);
-        return canPlay;
+        return !normalizedSuit.seven;
     }
     
     // For non-7 cards, the suit must be opened (7 must be played first)
@@ -341,40 +336,5 @@ function validateMove(playerId, card, gameState, players, board, hands) {
     }
     
     return { valid: true };
-}
-
-// Get hint for next playable card
-function getPlayableCardHint(hand, board) {
-    const playableCards = getPlayableCards(hand, board);
-    
-    if (playableCards.length === 0) {
-        return { hasPlayableCards: false, message: 'No playable cards. You must pass.' };
-    }
-    
-    // Prioritize 7H if available
-    if (playableCards.includes('7H')) {
-        return { 
-            hasPlayableCards: true, 
-            suggestion: '7H',
-            message: '7 of Hearts starts the game!' 
-        };
-    }
-    
-    // Suggest playing 7s to open suits
-    const sevens = playableCards.filter(card => card.startsWith('7'));
-    if (sevens.length > 0) {
-        return {
-            hasPlayableCards: true,
-            suggestion: sevens[0],
-            message: `Play ${sevens[0]} to open a new suit`
-        };
-    }
-    
-    // Otherwise suggest any playable card
-    return {
-        hasPlayableCards: true,
-        suggestion: playableCards[0],
-        message: `You can play ${playableCards.length} card(s)`
-    };
 }
 

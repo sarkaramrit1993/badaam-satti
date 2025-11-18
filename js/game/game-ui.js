@@ -1,11 +1,44 @@
 // Game UI Rendering Functions
 
+// Track last played card for highlighting
+let lastPlayedCard = null;
+
+// Get playable cards setting from localStorage (default: false)
+function getPlayableCardsSetting() {
+    const saved = localStorage.getItem('showPlayableCards');
+    return saved === 'true';
+}
+
+// Toggle playable cards setting
+function togglePlayableCards() {
+    const current = getPlayableCardsSetting();
+    const newValue = !current;
+    localStorage.setItem('showPlayableCards', newValue.toString());
+    
+    // Update button appearance
+    const toggle = document.getElementById('playableCardsToggle');
+    if (toggle) {
+        toggle.style.opacity = newValue ? '1' : '0.5';
+        toggle.title = newValue ? 'Hide Playable Cards' : 'Show Playable Cards';
+    }
+    
+    // Re-render hand with new setting
+    renderPlayerHand(gameState.getMyHand());
+    
+    showToast(newValue ? 'Playable cards highlighted' : 'Playable cards hidden', 'info');
+}
+
 // Render the game board
-function renderBoard(board) {
+function renderBoard(board, lastAction = null) {
     // Safety check: ensure board exists
     if (!board) {
         console.warn('Board is undefined, skipping render');
         return;
+    }
+    
+    // Track the most recently played card
+    if (lastAction && lastAction.type === 'play' && lastAction.player !== currentUser.uid) {
+        lastPlayedCard = lastAction.card;
     }
     
     for (const suitName in board) {
@@ -41,7 +74,12 @@ function renderBoard(board) {
             // Render downward sequence (6, 5, 4, 3, 2, A)
             if (normalizedSuit.down.length > 0) {
                 normalizedSuit.down.slice().reverse().forEach(card => {
-                    sequenceContainer.appendChild(createBoardCardElement(card));
+                    const cardElement = createBoardCardElement(card);
+                    // Highlight if this is the last played card by another player
+                    if (card === lastPlayedCard && lastAction && lastAction.player !== currentUser.uid) {
+                        cardElement.classList.add('recently-played');
+                    }
+                    sequenceContainer.appendChild(cardElement);
                 });
             }
             
@@ -49,17 +87,39 @@ function renderBoard(board) {
             if (normalizedSuit.seven && normalizedSuit.sequence.length > 0) {
                 const seven = normalizedSuit.sequence.find(c => c.startsWith('7'));
                 if (seven) {
-                    sequenceContainer.appendChild(createBoardCardElement(seven));
+                    const cardElement = createBoardCardElement(seven);
+                    // Highlight if this is the last played card by another player
+                    if (seven === lastPlayedCard && lastAction && lastAction.player !== currentUser.uid) {
+                        cardElement.classList.add('recently-played');
+                    }
+                    sequenceContainer.appendChild(cardElement);
                 }
             }
             
             // Render upward sequence (8, 9, 10, J, Q, K)
             if (normalizedSuit.up.length > 0) {
                 normalizedSuit.up.forEach(card => {
-                    sequenceContainer.appendChild(createBoardCardElement(card));
+                    const cardElement = createBoardCardElement(card);
+                    // Highlight if this is the last played card by another player
+                    if (card === lastPlayedCard && lastAction && lastAction.player !== currentUser.uid) {
+                        cardElement.classList.add('recently-played');
+                    }
+                    sequenceContainer.appendChild(cardElement);
                 });
             }
         }
+    }
+    
+    // Clear highlight after 3 seconds
+    if (lastPlayedCard) {
+        setTimeout(() => {
+            lastPlayedCard = null;
+            // Re-render board to remove highlight
+            const gameData = gameState?.getGameData();
+            if (gameData?.board) {
+                renderBoard(gameData.board, null);
+            }
+        }, 3000);
     }
 }
 
@@ -67,7 +127,12 @@ function renderBoard(board) {
 function createBoardCardElement(cardStr) {
     const div = document.createElement('div');
     div.innerHTML = getCardHTML(cardStr);
-    return div.firstElementChild;
+    const cardElement = div.firstElementChild;
+    // Add data attribute for easy identification
+    if (cardElement) {
+        cardElement.dataset.card = cardStr;
+    }
+    return cardElement;
 }
 
 // Render player's hand
@@ -91,31 +156,19 @@ function renderPlayerHand(hand) {
     // Sort hand
     const sortedHand = sortCards([...hand]);
     
-    // Get playable cards
-    const gameData = gameState.getGameData();
-    const board = gameData?.board;
-    
-    // Debug: Log board state for 7H check
-    if (hand.includes('7H')) {
-        console.log('Checking 7H playability - Board state:', JSON.stringify(board));
-        console.log('Game started?', board && Object.values(board).some(s => {
-            if (!s) return false;
-            const seq = Array.isArray(s.sequence) ? s.sequence : [];
-            return (s.seven || false) || seq.length > 0;
-        }));
-    }
-    
-    const playableCards = getPlayableCards(hand, board);
-    
-    // Debug: Log playable cards
-    if (hand.includes('7H')) {
-        console.log('Playable cards:', playableCards);
-        console.log('7H is playable?', playableCards.includes('7H'));
+    // Get playable cards if setting is enabled
+    const showPlayable = getPlayableCardsSetting();
+    let playableCards = [];
+    if (showPlayable) {
+        const gameData = gameState.getGameData();
+        const board = gameData?.board;
+        playableCards = getPlayableCards(hand, board);
     }
     
     // Render each card
     sortedHand.forEach(cardStr => {
-        const cardElement = createPlayerCardElement(cardStr, playableCards.includes(cardStr));
+        const isPlayable = showPlayable && playableCards.includes(cardStr);
+        const cardElement = createPlayerCardElement(cardStr, isPlayable);
         cardsContainer.appendChild(cardElement);
     });
     
@@ -124,18 +177,28 @@ function renderPlayerHand(hand) {
 }
 
 // Create a card element for player's hand
-function createPlayerCardElement(cardStr, isPlayable) {
+function createPlayerCardElement(cardStr, isPlayable = false) {
     const { rank, suit } = parseCard(cardStr);
     const color = SUIT_COLORS[suit];
     const symbol = SUIT_SYMBOLS[suit];
     
     const card = document.createElement('div');
-    card.className = `card ${color} ${isPlayable ? 'playable' : 'disabled'}`;
+    // Add playable class if highlighting is enabled and card is playable
+    const showPlayable = getPlayableCardsSetting();
+    if (showPlayable && isPlayable) {
+        card.className = `card ${color} playable`;
+    } else {
+        card.className = `card ${color}`;
+    }
     card.dataset.card = cardStr;
     
-    if (isPlayable && gameState.isMyTurn()) {
+    // All cards are clickable when it's your turn (validation will reject invalid ones)
+    if (gameState.isMyTurn()) {
         card.onclick = () => playCardAction(cardStr);
         card.style.cursor = 'pointer';
+    } else {
+        card.style.cursor = 'not-allowed';
+        card.style.opacity = '0.6';
     }
     
     // Simplified: just rank and suit symbol, no overlapping corners
@@ -249,7 +312,6 @@ function updatePassButton() {
     const myHand = gameState.getMyHand();
     const canPlay = canMakeAnyMove(myHand, board);
     
-    console.log('Pass button update - My turn:', isMyTurn, 'Can play:', canPlay);
     
     if (canPlay) {
         // Has playable cards - cannot pass
@@ -263,7 +325,6 @@ function updatePassButton() {
         passBtn.style.opacity = '1';
         passBtn.style.background = 'var(--warning-color)';
         passBtn.style.color = 'white';
-        console.log('✅ Pass button ENABLED - no playable cards!');
     }
 }
 
@@ -349,8 +410,6 @@ async function showGameOverModal(rankings) {
     const playAgainBtn = document.getElementById('playAgainBtn');
     const isHost = gameData.metadata.host === currentUser.uid;
     
-    console.log('Room type:', gameData.metadata.type, 'Is host:', isHost);
-    
     if (gameData.metadata.type === 'session') {
         if (playAgainBtn) {
             playAgainBtn.style.display = 'block';
@@ -370,10 +429,6 @@ async function showGameOverModal(rankings) {
     }
     
     modal.classList.remove('hidden');
-    console.log('✅ Game over modal displayed!');
-    console.log('  Players:', rankings.length);
-    console.log('  Room type:', gameData.metadata.type);
-    console.log('  Is host:', isHost);
 }
 
 // Show session update in game over modal

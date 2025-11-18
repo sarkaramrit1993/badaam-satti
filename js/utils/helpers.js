@@ -176,24 +176,6 @@ function getCurrentWeekString() {
     return `${year}-W${week.toString().padStart(2, '0')}`;
 }
 
-// Debounce function
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Check if it's user's turn
-function isMyTurn(currentTurn, userId) {
-    return currentTurn === userId;
-}
-
 // Get position medal
 function getPositionMedal(position) {
     const medals = {
@@ -207,11 +189,6 @@ function getPositionMedal(position) {
 // Format score display
 function formatScore(score) {
     return score === 0 ? 'Winner!' : `${score} pts`;
-}
-
-// Sleep function for delays
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Check if browser supports required features
@@ -231,15 +208,6 @@ function checkBrowserSupport() {
     }
     
     return unsupported.length === 0;
-}
-
-// Safe parse JSON
-function safeParseJSON(str, defaultValue = null) {
-    try {
-        return JSON.parse(str);
-    } catch (e) {
-        return defaultValue;
-    }
 }
 
 // Animate element

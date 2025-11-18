@@ -57,7 +57,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 // Setup event handlers for game state changes
 function setupGameEventHandlers() {
     gameState.onGameStateChange = (newGameState) => {
-        console.log('Game state changed, current turn:', newGameState.currentTurn, 'My UID:', currentUser.uid);
         updateTurnIndicator(newGameState);
         checkGameOver(newGameState);
         // Re-render hand when turn changes (playable cards change)
@@ -66,9 +65,10 @@ function setupGameEventHandlers() {
     };
     
     gameState.onBoardChange = (board) => {
-        console.log('Board changed');
-        renderBoard(board);
-        // Re-render hand when board changes (playable cards may change)
+        const gameData = gameState.getGameData();
+        const lastAction = gameData?.gameState?.lastAction;
+        renderBoard(board, lastAction);
+        // Re-render hand when board changes
         renderPlayerHand(gameState.getMyHand());
     };
     
@@ -78,7 +78,6 @@ function setupGameEventHandlers() {
     };
     
     gameState.onHandChange = (hand) => {
-        console.log('Hand changed, cards:', hand.length);
         renderPlayerHand(hand);
         updatePassButton();
     };
@@ -86,6 +85,14 @@ function setupGameEventHandlers() {
 
 // Initialize game UI
 function initializeGameUI() {
+    // Initialize playable cards toggle button state
+    const playableToggle = document.getElementById('playableCardsToggle');
+    if (playableToggle) {
+        const showPlayable = localStorage.getItem('showPlayableCards') === 'true';
+        playableToggle.style.opacity = showPlayable ? '1' : '0.5';
+        playableToggle.title = showPlayable ? 'Hide Playable Cards' : 'Show Playable Cards';
+    }
+    
     const roomCodeElement = document.getElementById('roomCode');
     if (roomCodeElement) {
         roomCodeElement.textContent = roomCode;
@@ -144,7 +151,6 @@ async function playCardAction(card) {
             if (!boardCopy[suitName].down) boardCopy[suitName].down = [];
         }
         const newBoard = playCard(card, boardCopy);
-        console.log('Board after playing', card, ':', JSON.stringify(newBoard));
         
         // Remove card from hand
         const newHand = gameState.getMyHand().filter(c => c !== card);
@@ -195,7 +201,6 @@ async function playCardAction(card) {
             
             // Save the snapshot for score calculation
             updates[`rooms/${roomCode}/gameState/finalHandsSnapshot`] = handsSnapshot;
-            console.log('Game finished! Saved hand snapshot:', handsSnapshot);
         }
         
         // Update database first
@@ -203,7 +208,6 @@ async function playCardAction(card) {
         
         // Then handle game over if finished
         if (newHand.length === 0) {
-            console.log('Triggering game over handling...');
             await handleGameOver();
         }
         
@@ -271,14 +275,10 @@ async function passRound() {
 
 // Handle game over
 async function handleGameOver() {
-    console.log('🎉 handleGameOver called!');
-    
     try {
         const gameData = gameState.getGameData();
-        console.log('Game data:', gameData);
         
         if (!gameData || !gameData.hands) {
-            console.error('Missing game data or hands');
             // Show modal anyway with basic info
             const players = gameData?.players || {};
             const rankings = Object.entries(players).map(([uid, p], i) => ({
@@ -292,13 +292,8 @@ async function handleGameOver() {
         
         // Use the SNAPSHOT saved at game finish moment (most accurate!)
         const finalHandsSnapshot = gameData.gameState.finalHandsSnapshot;
-        
         const players = gameData.players;
         const winner = gameData.gameState.winner;
-        
-        console.log('Using hand snapshot from game finish:', finalHandsSnapshot);
-        console.log('Players:', players);
-        console.log('Winner:', winner);
         
         // Calculate final scores from snapshot
         const scores = {};
@@ -306,19 +301,15 @@ async function handleGameOver() {
             if (uid === winner) {
                 // Winner has 0 points (played all cards)
                 scores[uid] = 0;
-                console.log(`${uid} (winner): 0 points`);
             } else {
                 // Calculate points from snapshot of remaining cards
                 const hand = finalHandsSnapshot?.[uid]?.cards || [];
                 const points = calculatePoints(hand);
                 scores[uid] = points;
-                console.log(`${uid}: ${hand.length} cards = ${points} points (${hand.join(', ')})`);
             }
         }
-        console.log('Final scores calculated:', scores);
         
         const rankings = getRankings(scores);
-        console.log('Rankings:', rankings);
         
         // Update final scores in database
         const updates = {};
@@ -329,10 +320,8 @@ async function handleGameOver() {
         updates[`rooms/${roomCode}/gameState/finalScores`] = scores;
         
         await database.ref().update(updates);
-        console.log('Final scores updated in database');
         
         // SHOW MODAL FIRST - Don't wait for stats
-        console.log('Showing game over modal NOW...');
         showGameOverModal(rankings);
         
         // Update stats in background (don't block modal)
@@ -492,11 +481,8 @@ function checkGameOver(gameStateData) {
     if (!gameStateData) return;
     
     if (gameStateData.finished) {
-        console.log('Game over detected! Finished:', gameStateData.finished, 'Winner:', gameStateData.winner);
-        
         // Only handle once per client
         if (!gameStateData.gameOverHandled && !window.gameOverProcessed) {
-            console.log('Handling game over for the first time...');
             window.gameOverProcessed = true;
             
             // Mark as handled in database
@@ -562,14 +548,6 @@ function viewStats() {
     showSuccess('Stats feature coming soon!');
 }
 
-// Return to lobby (from game over modal)
-function returnToLobby() {
-    if (gameState) {
-        gameState.cleanup();
-    }
-    window.location.href = 'index.html';
-}
-
 // Copy room code
 function copyRoomCode() {
     copyToClipboard(roomCode);
@@ -587,7 +565,6 @@ async function playAgain() {
     
     try {
         showLoading(true);
-        console.log('Host starting new game...');
         
         // Reset game state
         const updates = {};
@@ -613,7 +590,6 @@ async function playAgain() {
         
         await database.ref().update(updates);
         
-        console.log('Game reset, returning to waiting room...');
         showSuccess('New game starting! Get ready!');
         
         // Return to lobby/waiting room
@@ -637,7 +613,6 @@ function returnToLobby() {
 
 // View stats
 function viewStats() {
-    // Could implement a stats modal here
     showSuccess('Stats feature coming soon!');
 }
 
