@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badaam Saat - Game</title>
+    
+    <!-- Prevent Caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link rel="stylesheet" href="css/styles.css?v=2.0">
+    <link rel="stylesheet" href="css/game.css?v=2.0">
+    <link rel="stylesheet" href="css/mobile.css?v=2.0">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <div class="room-info">
+                <span>Room: <strong id="roomCode"></strong></span>
+                <button onclick="copyRoomCode()" class="btn-copy-small" title="Copy room code">📋</button>
+            </div>
+            <div class="turn-indicator" id="turnIndicator">Waiting...</div>
+            <button onclick="leaveGame()" class="btn-leave-game">Leave Game</button>
+        </header>
+
+        <!-- Game Board -->
+        <main class="game-board">
+            <!-- Opponents Area -->
+            <div class="opponents-area" id="opponentsArea">
+                <div class="opponent" id="opponent1" style="display: none;">
+                    <div class="player-info">
+                        <div class="player-name"></div>
+                        <div class="card-count">13 cards</div>
+                    </div>
+                    <div class="opponent-cards"></div>
+                </div>
+                <div class="opponent" id="opponent2" style="display: none;">
+                    <div class="player-info">
+                        <div class="player-name"></div>
+                        <div class="card-count">13 cards</div>
+                    </div>
+                    <div class="opponent-cards"></div>
+                </div>
+                <div class="opponent" id="opponent3" style="display: none;">
+                    <div class="player-info">
+                        <div class="player-name"></div>
+                        <div class="card-count">13 cards</div>
+                    </div>
+                    <div class="opponent-cards"></div>
+                </div>
+            </div>
+
+            <!-- Playing Area -->
+            <div class="playing-area">
+                <div class="suit-area" id="heartsArea">
+                    <div class="suit-label"><span class="suit-icon red">♥</span> Hearts</div>
+                    <div class="cards-sequence" id="heartsSequence">
+                        <div class="empty-slot">7♥ starts the game</div>
+                    </div>
+                </div>
+                <div class="suit-area" id="spadesArea">
+                    <div class="suit-label"><span class="suit-icon black">♠</span> Spades</div>
+                    <div class="cards-sequence" id="spadesSequence">
+                        <div class="empty-slot">Play 7♠ to open</div>
+                    </div>
+                </div>
+                <div class="suit-area" id="diamondsArea">
+                    <div class="suit-label"><span class="suit-icon red">♦</span> Diamonds</div>
+                    <div class="cards-sequence" id="diamondsSequence">
+                        <div class="empty-slot">Play 7♦ to open</div>
+                    </div>
+                </div>
+                <div class="suit-area" id="clubsArea">
+                    <div class="suit-label"><span class="suit-icon black">♣</span> Clubs</div>
+                    <div class="cards-sequence" id="clubsSequence">
+                        <div class="empty-slot">Play 7♣ to open</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player's Hand -->
+            <div class="player-hand" id="playerHand">
+                <!-- Cards will be dynamically added here -->
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button id="passBtn" onclick="passRound()" class="btn-pass" disabled>Pass</button>
+                <div class="game-status" id="gameStatus">
+                    <span id="cardsRemaining">0 cards</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Game Over Modal -->
+        <div id="gameOverModal" class="modal hidden">
+            <div class="modal-content game-over-content">
+                <h2>🎉 Game Over!</h2>
+                
+                <div id="gameResults" class="game-results">
+                    <!-- Results will be populated here -->
+                </div>
+
+                <div id="sessionUpdate" class="session-update hidden">
+                    <h3>Session Update</h3>
+                    <div id="sessionUpdateContent"></div>
+                </div>
+
+                <div class="game-over-actions">
+                    <button onclick="playAgain()" class="btn-primary" id="playAgainBtn">Play Again</button>
+                    <button onclick="viewStats()" class="btn-secondary">View Stats</button>
+                    <button onclick="returnToLobby()" class="btn-ghost">Return to Lobby</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Loading game...</p>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    
+    <!-- Game Scripts -->
+    <script src="js/utils/constants.js?v=2.4"></script>
+    <script src="js/utils/helpers.js?v=2.4"></script>
+    <script src="js/config/firebase-config.js?v=2.4"></script>
+    <script src="js/game/card-logic.js?v=2.4"></script>
+    <script src="js/game/game-state.js?v=2.4"></script>
+    <script src="js/game/game-engine.js?v=2.4"></script>
+    <script src="js/game/game-ui.js?v=2.4"></script>
+</body>
+</html>
+

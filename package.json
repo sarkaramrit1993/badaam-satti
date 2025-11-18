@@ -1,0 +1,21 @@
+{
+  "name": "badaam-saat",
+  "version": "1.0.0",
+  "description": "Badaam Saat multiplayer card game",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": ["card-game", "multiplayer", "badaam-saat"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}
+
+

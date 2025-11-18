@@ -1,0 +1,793 @@
+/* Badaam Saat - Main Stylesheet */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #7c3aed;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-light: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --border-color: #475569;
+    --red-suit: #dc2626;
+    --black-suit: #1f2937;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--background) 0%, #1e293b 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* App Container */
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.main-header {
+    background: var(--surface);
+    padding: 1rem 2rem;
+    border-bottom: 2px solid var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.game-title {
+    font-size: 2rem;
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* Auth Section */
+.auth-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.auth-container {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    max-width: 400px;
+    width: 100%;
+}
+
+.auth-container h2 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.game-description {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.auth-form, .reset-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-form input, .reset-form input {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--background);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.auth-form input:focus, .reset-form input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #6d28d9;
+    transform: translateY(-2px);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-ghost:hover {
+    background: var(--surface-light);
+    border-color: var(--text-secondary);
+}
+
+.btn-link {
+    background: transparent;
+    color: var(--primary-color);
+    padding: 0.5rem;
+    text-decoration: underline;
+}
+
+.btn-create {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-create:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.btn-join {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-public, .btn-leaderboard {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-public:hover, .btn-leaderboard:hover {
+    background: #6d28d9;
+}
+
+.btn-leave {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-leave:hover {
+    background: #dc2626;
+}
+
+.btn-ready {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-start {
+    background: var(--primary-color);
+    color: white;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+}
+
+.btn-history {
+    background: var(--surface-light);
+    color: var(--text-primary);
+}
+
+.btn-copy, .btn-copy-small {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    padding: 0.5rem 0.75rem;
+    font-size: 1.2rem;
+}
+
+.btn-copy:hover, .btn-copy-small:hover {
+    background: var(--surface-light);
+}
+
+/* Lobby Section */
+.lobby-section {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.lobby-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+.room-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.join-room {
+    display: flex;
+    gap: 1rem;
+}
+
+.join-room input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+/* My Rooms */
+.my-rooms {
+    margin: 2rem 0;
+}
+
+.my-rooms h3 {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.room-card {
+    background: var(--surface);
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.room-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+}
+
+.room-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.room-card .room-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.room-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.badge-session {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.badge-single {
+    background: var(--success-color);
+    color: white;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--surface-light);
+    color: var(--text-primary);
+}
+
+/* Create Room Form */
+.create-room-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--background);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.radio-group, .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.radio-label:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-light);
+}
+
+.radio-label input[type="radio"] {
+    margin-top: 0.25rem;
+}
+
+.radio-label small {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-col small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Waiting Room */
+.waiting-room {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.room-header {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.room-code {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.room-code strong {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.room-type-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    background: var(--secondary-color);
+    color: white;
+    font-weight: 600;
+}
+
+/* Session Stats */
+.session-stats {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Session Leaderboard */
+.session-leaderboard {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.standings-table {
+    margin-top: 1rem;
+}
+
+.standings-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--surface-light);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.standings-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    background: var(--background);
+}
+
+.standings-item.highlight {
+    background: var(--surface-light);
+    border: 2px solid var(--primary-color);
+}
+
+/* Players List */
+.players-list {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.player-ready {
+    border: 2px solid var(--success-color);
+}
+
+.player-name {
+    font-weight: 600;
+}
+
+.player-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+}
+
+.status-indicator.ready {
+    background: var(--success-color);
+}
+
+/* Room Controls */
+.room-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Leaderboard Modal */
+.leaderboard-modal {
+    max-width: 700px;
+}
+
+.leaderboard-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem;
+    background: var(--surface-light);
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.leaderboard-content {
+    min-height: 300px;
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 0.5rem;
+    border: 2px solid transparent;
+}
+
+.leaderboard-item.current-user {
+    border-color: var(--primary-color);
+    background: var(--surface-light);
+}
+
+.leaderboard-item .rank {
+    font-weight: 700;
+    min-width: 60px;
+}
+
+.leaderboard-item .username {
+    flex: 1;
+    font-weight: 600;
+}
+
+.leaderboard-item .stats {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-secondary);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.loading-spinner.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--surface-light);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.toast {
+    background: var(--surface);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-color);
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-error {
+    color: var(--danger-color);
+}
+
+.text-success {
+    color: var(--success-color);
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem;
+}
+
+.error {
+    text-align: center;
+    color: var(--danger-color);
+    padding: 2rem;
+}
+

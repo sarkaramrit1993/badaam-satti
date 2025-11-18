@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Testing
+tests/
+test-results/
+playwright-report/
+playwright.config.js
+
+# Server
+server.log
+server.pid
+
+# Admin Tools (DO NOT COMMIT - Security Risk!)
+cleanup-firebase.html
+
+# Documentation (keep only README.md)
+*_SUMMARY.md
+*_GUIDE.md
+*_TEST.md
+TESTING.md
+STRATEGY.md
+
+# IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local

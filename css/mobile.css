@@ -1,0 +1,341 @@
+/* Mobile Responsive Styles */
+
+@media (max-width: 1024px) {
+    .playing-area {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+    
+    .suit-area {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Header */
+    .main-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .game-title {
+        font-size: 1.5rem;
+    }
+    
+    /* Main Content */
+    .main-content {
+        padding: 1rem;
+    }
+    
+    /* Auth Section */
+    .auth-container {
+        padding: 2rem 1.5rem;
+    }
+    
+    /* Lobby */
+    .rooms-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .room-options {
+        flex-direction: column;
+    }
+    
+    /* Modal */
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Room Controls */
+    .room-controls {
+        flex-direction: column;
+    }
+    
+    .room-controls button {
+        width: 100%;
+    }
+    
+    /* Leaderboard */
+    .leaderboard-tabs {
+        flex-direction: column;
+    }
+    
+    .standings-header,
+    .standings-item {
+        grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr;
+        font-size: 0.85rem;
+    }
+    
+    /* Game Header */
+    .game-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+    
+    .room-info {
+        font-size: 0.9rem;
+    }
+    
+    .turn-indicator {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    /* Opponents Area */
+    .opponents-area {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .opponent {
+        min-width: 100%;
+    }
+    
+    /* Playing Area */
+    .playing-area {
+        gap: 0.5rem;
+    }
+    
+    .suit-area {
+        padding: 0.75rem;
+    }
+    
+    .suit-label {
+        font-size: 1rem;
+    }
+    
+    .cards-sequence {
+        overflow-x: auto;
+        min-height: 80px;
+    }
+    
+    /* Cards */
+    .card {
+        width: 55px;
+        height: 80px;
+    }
+    
+    .card-rank {
+        font-size: 1.2rem;
+    }
+    
+    .card-suit {
+        font-size: 1.5rem;
+    }
+    
+    .card-back {
+        width: 40px;
+        height: 60px;
+    }
+    
+    /* Player's Hand */
+    .player-hand {
+        padding: 0.75rem;
+    }
+    
+    .player-hand .cards-container {
+        gap: 0.25rem;
+    }
+    
+    /* Game Controls */
+    .game-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-pass {
+        width: 100%;
+    }
+    
+    /* Game Over Modal */
+    .game-over-actions {
+        flex-direction: column;
+    }
+    
+    .game-over-actions button {
+        width: 100%;
+    }
+    
+    /* Toast Container */
+    .toast-container {
+        right: 1rem;
+        left: 1rem;
+        top: 1rem;
+    }
+    
+    .toast {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Buttons */
+    button {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    /* Auth */
+    .auth-container h2 {
+        font-size: 1.5rem;
+    }
+    
+    /* Lobby */
+    .lobby-container h2 {
+        font-size: 1.5rem;
+    }
+    
+    /* Room Header */
+    .room-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .room-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    /* Session Stats */
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Standings Table */
+    .standings-header,
+    .standings-item {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+    
+    /* Cards - Even Smaller */
+    .card {
+        width: 50px;
+        height: 72px;
+    }
+    
+    .card-rank {
+        font-size: 1rem;
+    }
+    
+    .card-suit {
+        font-size: 1.3rem;
+    }
+    
+    .card-corners {
+        font-size: 0.7rem;
+    }
+    
+    /* Playing Area */
+    .suit-label {
+        font-size: 0.9rem;
+    }
+    
+    .suit-icon {
+        font-size: 1.2rem;
+    }
+    
+    /* Game Status */
+    #cardsRemaining {
+        font-size: 1rem;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 896px) and (orientation: landscape) {
+    .game-board {
+        overflow-y: scroll;
+    }
+    
+    .opponents-area {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .opponent {
+        min-width: 140px;
+        flex: 1;
+    }
+    
+    .playing-area {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        height: auto;
+    }
+}
+
+/* Touch Improvements */
+@media (hover: none) {
+    .card:hover {
+        transform: none;
+    }
+    
+    .card.playable:active {
+        transform: scale(0.95);
+    }
+    
+    button:hover {
+        transform: none;
+    }
+    
+    button:active {
+        transform: scale(0.98);
+    }
+    
+    .room-card:hover {
+        transform: none;
+    }
+    
+    .room-card:active {
+        transform: scale(0.98);
+    }
+}
+
+/* High DPI Screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .card {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card:hover {
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Dark Mode Support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+    /* Already dark by default */
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .main-header,
+    .btn-leave-game,
+    .game-controls,
+    .room-controls {
+        display: none;
+    }
+    
+    .game-board {
+        padding: 0;
+    }
+}
+

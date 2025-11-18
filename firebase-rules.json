@@ -1,0 +1,88 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "$uid === auth.uid",
+        ".indexOn": ["lastSeen", "createdAt"]
+      }
+    },
+    
+    "rooms": {
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        
+        "metadata": {
+          ".write": "!data.exists() || data.child('host').val() === auth.uid"
+        },
+        
+        "members": {
+          "$memberId": {
+            ".write": "$memberId === auth.uid || root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+          }
+        },
+        
+        "players": {
+          ".write": "root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+        },
+        
+        "gameState": {
+          ".write": "root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid || 
+                     root.child('rooms').child($roomId).child('gameState').child('currentTurn').val() === auth.uid"
+        },
+        
+        "board": {
+          ".write": "root.child('rooms').child($roomId).child('gameState').child('currentTurn').val() === auth.uid ||
+                     root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+        },
+        
+        "hands": {
+          "$playerId": {
+            ".read": "$playerId === auth.uid || root.child('rooms').child($roomId).child('gameState').child('finished').val() === true",
+            ".write": "$playerId === auth.uid || root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+          }
+        },
+        
+        "sessionLeaderboard": {
+          ".read": "auth != null",
+          ".write": "root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+        },
+        
+        "gameHistory": {
+          ".read": "auth != null",
+          ".write": "root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+        }
+      }
+    },
+    
+    "publicRooms": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["created", "currentPlayers"]
+    },
+    
+    "userRooms": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    
+    "leaderboard": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      
+      "daily": {
+        ".indexOn": [".value"]
+      },
+      "weekly": {
+        ".indexOn": [".value"]
+      },
+      "allTime": {
+        ".indexOn": [".value"]
+      }
+    }
+  }
+}
+

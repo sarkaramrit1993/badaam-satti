@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badaam Saat - Multiplayer Card Game</title>
+    
+    <!-- Prevent Caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link rel="stylesheet" href="css/styles.css?v=2.0">
+    <link rel="stylesheet" href="css/mobile.css?v=2.0">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <h1 class="game-title">🃏 Badaam Saat</h1>
+            <div class="user-info" id="userInfo"></div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Login Section -->
+            <section id="authSection" class="auth-section">
+                <div class="auth-container">
+                    <h2>Welcome to Badaam Saat!</h2>
+                    <p class="game-description">The classic card game of strategy and sequencing</p>
+                    
+                    <!-- Login Form -->
+                    <div id="loginForm" class="auth-form">
+                        <input type="email" id="emailInput" placeholder="Email" autocomplete="email">
+                        <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+                        <button onclick="login()" class="btn-primary">Login</button>
+                        <button onclick="register()" class="btn-secondary">Register</button>
+                        <button onclick="playAsGuest()" class="btn-ghost">Play as Guest</button>
+                        <button onclick="showResetForm()" class="btn-link">Forgot Password?</button>
+                    </div>
+
+                    <!-- Password Reset -->
+                    <div id="resetForm" class="reset-form hidden">
+                        <input type="email" id="resetEmail" placeholder="Enter your email">
+                        <button onclick="resetPassword()" class="btn-primary">Reset Password</button>
+                        <button onclick="showLogin()" class="btn-ghost">Back to Login</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lobby Section -->
+            <section id="lobbySection" class="lobby-section hidden">
+                <div class="lobby-container">
+                    <h2>Game Lobby</h2>
+                    
+                    <!-- Room Options -->
+                    <div class="room-options">
+                        <button onclick="showCreateRoomModal()" class="btn-create">Create Room</button>
+                        <div class="join-room">
+                            <input type="text" id="roomCode" placeholder="Enter Room Code" maxlength="6" style="text-transform: uppercase;">
+                            <button onclick="joinRoom()" class="btn-join">Join Room</button>
+                        </div>
+                        <button onclick="showPublicRooms()" class="btn-public">🌐 Public Rooms</button>
+                        <button onclick="showLeaderboard()" class="btn-leaderboard">🏆 Leaderboard</button>
+                    </div>
+
+                    <!-- My Active Rooms -->
+                    <div id="myRooms" class="my-rooms">
+                        <h3>My Active Rooms</h3>
+                        <div id="activeRoomsList" class="rooms-grid">
+                            <!-- User's active rooms will be listed here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Public Rooms List -->
+                    <div id="publicRoomsList" class="public-rooms hidden">
+                        <h3>Public Rooms</h3>
+                        <div id="publicRoomsGrid" class="rooms-grid">
+                            <!-- Public rooms will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Create Room Modal -->
+            <div id="createRoomModal" class="modal hidden">
+                <div class="modal-content">
+                    <button onclick="closeCreateRoomModal()" class="modal-close">✕</button>
+                    <h2>Create New Room</h2>
+                    
+                    <div class="create-room-form">
+                        <div class="form-group">
+                            <label>Room Name:</label>
+                            <input type="text" id="roomNameInput" placeholder="e.g., Friday Night Games" maxlength="30">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Room Type:</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="roomType" value="session" checked>
+                                    <span><strong>Session</strong> (Multiple Games)</span>
+                                    <small>Play multiple games with cumulative scoring</small>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="roomType" value="single">
+                                    <span><strong>Single Game</strong></span>
+                                    <small>Play one game and room closes</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group session-options" id="sessionOptions">
+                            <label>Session Settings:</label>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="allowLateJoin" checked>
+                                    Allow players to join mid-session
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="isPublic">
+                                    Make room public (anyone can join)
+                                </label>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label>Target Score (Optional):</label>
+                                    <input type="number" id="targetScore" placeholder="e.g., 500" min="100">
+                                    <small>First to reach this loses</small>
+                                </div>
+                                <div class="form-col">
+                                    <label>Max Games (Optional):</label>
+                                    <input type="number" id="maxGames" placeholder="e.g., 10" min="1">
+                                    <small>Session ends after X games</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="createRoom()" class="btn-primary">Create Room</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Waiting Room -->
+            <section id="waitingRoom" class="waiting-room hidden">
+                <div class="room-header">
+                    <div class="room-title">
+                        <h2 id="roomName">Room Name</h2>
+                        <span class="room-code">Code: <span id="currentRoomCode"></span></span>
+                        <button onclick="copyRoomCode()" class="btn-copy" title="Copy room code">📋</button>
+                    </div>
+                    <div class="room-type-badge" id="roomTypeBadge">Session</div>
+                </div>
+                
+                <!-- Session Stats (for session rooms) -->
+                <div id="sessionStats" class="session-stats hidden">
+                    <h3>Session Progress</h3>
+                    <div class="stats-row">
+                        <div class="stat">
+                            <span class="stat-label">Games Played:</span>
+                            <span class="stat-value" id="gamesPlayed">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Target Score:</span>
+                            <span class="stat-value" id="displayTargetScore">None</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Leader:</span>
+                            <span class="stat-value" id="sessionLeader">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Session Leaderboard -->
+                <div id="sessionLeaderboard" class="session-leaderboard hidden">
+                    <h3>Session Standings</h3>
+                    <div class="standings-table">
+                        <div class="standings-header">
+                            <span>Player</span>
+                            <span>Wins</span>
+                            <span>Total Pts</span>
+                            <span>Avg</span>
+                        </div>
+                        <div id="standingsList">
+                            <!-- Standings will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="players-list" id="playersList">
+                    <!-- Players will be listed here -->
+                </div>
+                
+                <!-- Game Settings (Host Only) -->
+                <div id="gameSettings" class="game-settings hidden">
+                    <h3>Game Settings</h3>
+                    <div id="threePlayerSettings" class="setting-group hidden">
+                        <label>3-Player Mode: Remove one card</label>
+                        <div class="setting-options">
+                            <label>
+                                <input type="radio" name="removeMethod" value="random" checked> Random Card
+                            </label>
+                            <label>
+                                <input type="radio" name="removeMethod" value="choose"> Choose Card
+                            </label>
+                            <select id="cardToRemove" class="hidden">
+                                <option value="">Select card to remove...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="room-controls">
+                    <button id="startGameBtn" onclick="startGame()" class="btn-start hidden">Start Game</button>
+                    <button id="readyBtn" onclick="toggleReady()" class="btn-ready">Ready</button>
+                    <button onclick="leaveRoom()" class="btn-leave">Leave Room</button>
+                    <button id="gameHistoryBtn" onclick="viewGameHistory()" class="btn-history hidden">📜 Game History</button>
+                </div>
+            </section>
+            
+            <!-- Leaderboard Modal -->
+            <div id="leaderboardModal" class="modal hidden">
+                <div class="modal-content leaderboard-modal">
+                    <button onclick="closeLeaderboard()" class="modal-close">✕</button>
+                    <h2>🏆 Leaderboard</h2>
+                    
+                    <div class="leaderboard-tabs">
+                        <button class="tab-btn active" onclick="switchLeaderboardTab('daily')">Daily</button>
+                        <button class="tab-btn" onclick="switchLeaderboardTab('weekly')">Weekly</button>
+                        <button class="tab-btn" onclick="switchLeaderboardTab('allTime')">All Time</button>
+                    </div>
+                    
+                    <div id="leaderboardContent" class="leaderboard-content">
+                        <!-- Leaderboard data will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game History Modal -->
+            <div id="gameHistoryModal" class="modal hidden">
+                <div class="modal-content">
+                    <button onclick="closeGameHistory()" class="modal-close">✕</button>
+                    <h2>📜 Game History</h2>
+                    <div id="gameHistoryContent" class="game-history-content">
+                        <!-- Game history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    
+    <!-- Game Scripts -->
+    <script src="js/utils/constants.js?v=2.4"></script>
+    <script src="js/utils/helpers.js?v=2.4"></script>
+    <script src="js/config/firebase-config.js?v=2.4"></script>
+    <script src="js/auth/auth.js?v=2.4"></script>
+    <script src="js/lobby/room-manager.js?v=2.4"></script>
+    <script src="js/lobby/lobby-ui.js?v=2.4"></script>
+</body>
+</html>
+
