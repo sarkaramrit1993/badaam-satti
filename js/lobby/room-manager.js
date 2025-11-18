@@ -584,14 +584,7 @@ async function leaveRoom() {
 }
 
 // Helper functions
-function createEmptyBoard() {
-    return {
-        hearts: { seven: false, sequence: [], up: [], down: [] },
-        spades: { seven: false, sequence: [], up: [], down: [] },
-        diamonds: { seven: false, sequence: [], up: [], down: [] },
-        clubs: { seven: false, sequence: [], up: [], down: [] }
-    };
-}
+// Note: createEmptyBoard() is now in helpers.js
 
 // Check if card distribution is fair
 function checkFairDistribution(hands) {

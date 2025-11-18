@@ -258,3 +258,13 @@ function animateElement(element, animationClass, duration = 1000) {
     }, duration);
 }
 
+// Create empty board structure
+function createEmptyBoard() {
+    return {
+        hearts: { seven: false, sequence: [], up: [], down: [] },
+        spades: { seven: false, sequence: [], up: [], down: [] },
+        diamonds: { seven: false, sequence: [], up: [], down: [] },
+        clubs: { seven: false, sequence: [], up: [], down: [] }
+    };
+}
+

@@ -294,9 +294,25 @@ async function showGameOverModal(rankings) {
     resultsContainer.innerHTML = '<p>Loading results...</p>';
     console.log('Loading results...');
     
-    // Load all usernames first
+    // Get players data from game state (has usernames)
+    const gameData = gameState.getGameData();
+    const players = gameData?.players || {};
+    
+    // Load all usernames first (use players data if available, otherwise fetch)
     const resultsPromises = rankings.map(async (entry) => {
-        const username = await getUserUsername(entry.uid);
+        // Try to get username from players data first (most reliable)
+        let username = players[entry.uid]?.username;
+        
+        // If not in players data, fetch from user profile
+        if (!username) {
+            username = await getUserUsername(entry.uid);
+        }
+        
+        // Fallback to "Guest" if still no username
+        if (!username || username === 'Player') {
+            username = `Guest_${entry.uid.slice(0, 4)}`;
+        }
+        
         const resultItem = document.createElement('div');
         resultItem.className = `result-item ${entry.position === 1 ? 'winner' : ''}`;
         
@@ -318,8 +334,7 @@ async function showGameOverModal(rankings) {
     resultsContainer.innerHTML = '';
     resultElements.forEach(elem => resultsContainer.appendChild(elem));
     
-    // Check if session room and show session update
-    const gameData = gameState.getGameData();
+    // Check if session room and show session update (gameData already loaded above)
     const playAgainBtn = document.getElementById('playAgainBtn');
     const isHost = gameData.metadata.host === currentUser.uid;
     
