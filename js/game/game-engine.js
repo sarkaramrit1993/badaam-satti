@@ -159,7 +159,17 @@ async function playCardAction(card) {
         updates[`rooms/${roomCode}/players/${currentUser.uid}/cardsCount`] = newHand.length;
         updates[`rooms/${roomCode}/gameState/currentTurn`] = nextPlayer;
         updates[`rooms/${roomCode}/gameState/turnNumber`] = firebase.database.ServerValue.increment(1);
+        // Update last action
         updates[`rooms/${roomCode}/gameState/lastAction`] = {
+            type: 'play',
+            player: currentUser.uid,
+            card: card,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        // Add to activity history
+        const activityKey = database.ref(`rooms/${roomCode}/activityHistory`).push().key;
+        updates[`rooms/${roomCode}/activityHistory/${activityKey}`] = {
             type: 'play',
             player: currentUser.uid,
             card: card,
@@ -218,7 +228,16 @@ async function passRound() {
         const updates = {};
         updates[`rooms/${roomCode}/gameState/currentTurn`] = nextPlayer;
         updates[`rooms/${roomCode}/gameState/turnNumber`] = firebase.database.ServerValue.increment(1);
+        // Update last action
         updates[`rooms/${roomCode}/gameState/lastAction`] = {
+            type: 'pass',
+            player: currentUser.uid,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        // Add to activity history
+        const activityKey = database.ref(`rooms/${roomCode}/activityHistory`).push().key;
+        updates[`rooms/${roomCode}/activityHistory/${activityKey}`] = {
             type: 'pass',
             player: currentUser.uid,
             timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -490,6 +509,7 @@ async function playAgain() {
         updates[`rooms/${roomCode}/board`] = createEmptyBoard();
         updates[`rooms/${roomCode}/hands`] = {};
         updates[`rooms/${roomCode}/players`] = {};
+        updates[`rooms/${roomCode}/activityHistory`] = null; // Clear activity history for new game
         
         // Mark all members as not ready
         const snapshot = await database.ref(`rooms/${roomCode}/members`).once('value');

@@ -5,13 +5,52 @@ const MAX_ACTIVITIES = 10;
 
 // Initialize activity feed listeners
 function initActivityFeed() {
-    // Listen for last action changes
-    database.ref(`rooms/${roomCode}/gameState/lastAction`).on('value', (snapshot) => {
-        const action = snapshot.val();
-        if (action) {
-            addActivity(action);
+    console.log('Initializing activity feed for room:', roomCode);
+    
+    // Listen to activity history in Firebase
+    database.ref(`rooms/${roomCode}/activityHistory`)
+        .limitToLast(MAX_ACTIVITIES)
+        .on('child_added', (snapshot) => {
+            const action = snapshot.val();
+            if (action && !activityLog.find(a => a.id === snapshot.key)) {
+                action.id = snapshot.key;
+                activityLog.unshift(action);
+                
+                // Keep only last 10
+                if (activityLog.length > MAX_ACTIVITIES) {
+                    activityLog.pop();
+                }
+                
+                renderActivityFeed();
+                console.log('Activity added:', action.type, action.card || '');
+            }
+        });
+    
+    // Initial load
+    loadActivityHistory();
+}
+
+// Load initial activity history
+async function loadActivityHistory() {
+    try {
+        const snapshot = await database.ref(`rooms/${roomCode}/activityHistory`)
+            .limitToLast(MAX_ACTIVITIES)
+            .once('value');
+        
+        if (snapshot.exists()) {
+            const activities = [];
+            snapshot.forEach((child) => {
+                const action = child.val();
+                action.id = child.key;
+                activities.unshift(action);
+            });
+            activityLog = activities;
+            renderActivityFeed();
+            console.log('Loaded', activityLog.length, 'activities');
         }
-    });
+    } catch (error) {
+        console.error('Error loading activity history:', error);
+    }
 }
 
 // Add an activity to the feed

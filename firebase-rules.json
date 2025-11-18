@@ -52,6 +52,12 @@
         "gameHistory": {
           ".read": "auth != null",
           ".write": "root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid"
+        },
+        
+        "activityHistory": {
+          ".read": "auth != null",
+          ".write": "root.child('rooms').child($roomId).child('gameState').child('currentTurn').val() === auth.uid || root.child('rooms').child($roomId).child('metadata').child('host').val() === auth.uid",
+          ".indexOn": ["timestamp"]
         }
       }
     },
