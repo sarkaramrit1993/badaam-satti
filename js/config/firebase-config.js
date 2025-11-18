@@ -38,7 +38,24 @@ auth.onAuthStateChanged((user) => {
 });
 
 // Handle user logged in
-function onUserLoggedIn() {
+async function onUserLoggedIn() {
+    // Ensure username exists in user profile (persist across sessions)
+    if (currentUser) {
+        try {
+            let username = await getUserUsername();
+            if (!username) {
+                // Create username if missing
+                username = currentUser.email ? currentUser.email.split('@')[0] : `User_${generateRoomCode(6)}`;
+                await database.ref(`users/${currentUser.uid}/username`).set(username);
+                console.log(`Created persistent username: ${username} for ${currentUser.uid}`);
+            } else {
+                console.log(`Username persisted: ${username} for ${currentUser.uid}`);
+            }
+        } catch (error) {
+            console.error('Error ensuring username on login:', error);
+        }
+    }
+    
     if (typeof hideAllSections === 'function') {
         hideAllSections();
     }

@@ -54,7 +54,13 @@ async function createRoom() {
             throw new Error('Failed to generate unique room code');
         }
         
-        const username = await getUserUsername();
+        // Ensure username exists and is persisted
+        let username = await getUserUsername();
+        if (!username) {
+            username = currentUser.email ? currentUser.email.split('@')[0] : `User_${generateRoomCode(6)}`;
+            await database.ref(`users/${currentUser.uid}/username`).set(username);
+            console.log(`Created persistent username: ${username} for ${currentUser.uid}`);
+        }
         
         // Room settings
         const settings = {
@@ -172,9 +178,19 @@ async function joinRoom() {
         
         // Check if already a member
         if (members[currentUser.uid]) {
-            // Rejoin as existing member
-            await database.ref(`rooms/${roomCode}/members/${currentUser.uid}/isActive`).set(true);
-            await database.ref(`rooms/${roomCode}/members/${currentUser.uid}/rejoinedAt`).set(firebase.database.ServerValue.TIMESTAMP);
+            // Rejoin as existing member - SYNC username from user profile
+            let username = await getUserUsername();
+            if (!username) {
+                username = `User_${generateRoomCode(6)}`;
+                await database.ref(`users/${currentUser.uid}/username`).set(username);
+            }
+            
+            // Update member data with current username (sync from user profile)
+            await database.ref(`rooms/${roomCode}/members/${currentUser.uid}`).update({
+                username: username,
+                isActive: true,
+                rejoinedAt: firebase.database.ServerValue.TIMESTAMP
+            });
         } else {
             // Add as new member - ensure username exists
             let username = await getUserUsername();
@@ -523,18 +539,32 @@ async function startGame() {
             firstPlayer = playerIds[0];
         }
         
-        // Create players data
+        // Create players data - SYNC usernames from user profiles (source of truth)
         const playersData = {};
-        playerIds.forEach(uid => {
+        for (const uid of playerIds) {
+            // Always get fresh username from user profile (persists across sessions)
+            let username = await getUserUsername(uid);
+            if (!username) {
+                // Fallback to member username if user profile doesn't exist
+                username = members[uid]?.username || `User_${uid.slice(0, 6)}`;
+                // Save it to user profile for future persistence
+                await database.ref(`users/${uid}/username`).set(username);
+            }
+            
+            // Also update member username to keep in sync
+            if (members[uid] && members[uid].username !== username) {
+                await database.ref(`rooms/${currentRoom}/members/${uid}/username`).set(username);
+            }
+            
             playersData[uid] = {
-                username: members[uid].username,
+                username: username,
                 ready: false,
                 cardsCount: hands[uid].length,
                 finalScore: 0,
                 finishPosition: null,
                 connected: true
             };
-        });
+        }
         
         // Update room with game data
         const updates = {};
