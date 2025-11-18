@@ -422,7 +422,14 @@ async function updateSessionStats(rankings) {
     const updates = {};
     
     for (const entry of rankings) {
-        const username = await getUserUsername(entry.uid);
+        // Ensure username exists (getUserUsername will create it if missing)
+        let username = await getUserUsername(entry.uid);
+        if (!username) {
+            console.error(`Failed to get username for ${entry.uid}`);
+            username = `User_${entry.uid.slice(0, 6)}`;
+            await database.ref(`users/${entry.uid}/username`).set(username);
+        }
+        
         const memberRef = `rooms/${roomCode}/members/${entry.uid}/sessionStats`;
         
         const snapshot = await database.ref(memberRef).once('value');
@@ -458,7 +465,13 @@ async function updateSessionStats(rankings) {
     const gameId = Date.now();
     const gameResults = {};
     for (const entry of rankings) {
-        const username = await getUserUsername(entry.uid);
+        // Ensure username exists (getUserUsername will create it if missing)
+        let username = await getUserUsername(entry.uid);
+        if (!username) {
+            console.error(`Failed to get username for ${entry.uid}`);
+            username = `User_${entry.uid.slice(0, 6)}`;
+            await database.ref(`users/${entry.uid}/username`).set(username);
+        }
         gameResults[entry.uid] = {
             username,
             position: entry.position,
