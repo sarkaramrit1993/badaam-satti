@@ -229,9 +229,7 @@
         font-size: 1.3rem;
     }
     
-    .card-corners {
-        font-size: 0.7rem;
-    }
+    /* Corner elements removed - simplified card design */
     
     /* Playing Area */
     .suit-label {
@@ -341,9 +339,7 @@
         font-size: 1.2rem;
     }
     
-    .card-corners {
-        font-size: 0.6rem;
-    }
+    /* Corner elements removed - simplified card design */
     
     /* Player hand compact */
     .player-hand {
