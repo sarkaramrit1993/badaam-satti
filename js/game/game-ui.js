@@ -301,9 +301,22 @@ async function showGameOverModal(rankings) {
     // Check if session room and show session update
     const gameData = gameState.getGameData();
     const playAgainBtn = document.getElementById('playAgainBtn');
+    const isHost = gameData.metadata.host === currentUser.uid;
+    
+    console.log('Room type:', gameData.metadata.type, 'Is host:', isHost);
     
     if (gameData.metadata.type === 'session') {
-        if (playAgainBtn) playAgainBtn.style.display = 'block';
+        if (playAgainBtn) {
+            playAgainBtn.style.display = 'block';
+            if (isHost) {
+                playAgainBtn.disabled = false;
+                playAgainBtn.textContent = 'Play Again (Host)';
+            } else {
+                playAgainBtn.disabled = true;
+                playAgainBtn.textContent = 'Waiting for Host...';
+                playAgainBtn.style.opacity = '0.6';
+            }
+        }
         showSessionUpdate();
     } else {
         // Hide play again button for single games
@@ -311,7 +324,10 @@ async function showGameOverModal(rankings) {
     }
     
     modal.classList.remove('hidden');
-    console.log('Game over modal displayed with', rankings.length, 'players');
+    console.log('✅ Game over modal displayed!');
+    console.log('  Players:', rankings.length);
+    console.log('  Room type:', gameData.metadata.type);
+    console.log('  Is host:', isHost);
 }
 
 // Show session update in game over modal

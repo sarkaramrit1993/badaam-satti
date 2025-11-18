@@ -520,10 +520,19 @@ function copyRoomCode() {
     copyToClipboard(roomCode);
 }
 
-// Play again (session rooms)
+// Play again (session rooms - HOST ONLY)
 async function playAgain() {
+    const gameData = gameState?.getGameData();
+    const isHost = gameData?.metadata?.host === currentUser.uid;
+    
+    if (!isHost) {
+        showError('Only the host can start a new game!');
+        return;
+    }
+    
     try {
         showLoading(true);
+        console.log('Host starting new game...');
         
         // Reset game state
         const updates = {};
@@ -531,6 +540,7 @@ async function playAgain() {
         updates[`rooms/${roomCode}/gameState/finished`] = false;
         updates[`rooms/${roomCode}/gameState/winner`] = null;
         updates[`rooms/${roomCode}/gameState/currentTurn`] = null;
+        updates[`rooms/${roomCode}/gameState/gameOverHandled`] = false;
         updates[`rooms/${roomCode}/board`] = createEmptyBoard();
         updates[`rooms/${roomCode}/hands`] = {};
         updates[`rooms/${roomCode}/players`] = {};
@@ -547,6 +557,9 @@ async function playAgain() {
         }
         
         await database.ref().update(updates);
+        
+        console.log('Game reset, returning to waiting room...');
+        showSuccess('New game starting! Get ready!');
         
         // Return to lobby/waiting room
         window.location.href = `index.html`;
