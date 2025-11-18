@@ -25,25 +25,36 @@ function canPlayCard(card, board) {
     };
     
     // Check if game has started (7H must be played first)
-    const gameStarted = Object.values(board).some(s => {
-        if (!s) return false;
+    // Game has started if ANY suit has been opened (seven = true) OR has cards in sequence
+    let gameStarted = false;
+    for (const suitName in board) {
+        const s = board[suitName];
+        if (!s) continue;
+        
         const normalized = {
             seven: s.seven || false,
-            sequence: s.sequence || [],
-            up: s.up || [],
-            down: s.down || []
+            sequence: Array.isArray(s.sequence) ? s.sequence : (s.sequence ? [s.sequence] : []),
+            up: Array.isArray(s.up) ? s.up : (s.up ? [s.up] : []),
+            down: Array.isArray(s.down) ? s.down : (s.down ? [s.down] : [])
         };
-        return normalized.seven || normalized.sequence.length > 0;
-    });
+        
+        if (normalized.seven || normalized.sequence.length > 0) {
+            gameStarted = true;
+            break;
+        }
+    }
     
     // Special case: 7H starts the game (must be first card)
     if (card === '7H') {
         // Can play 7H ONLY if no cards have been played yet
-        return !gameStarted;
+        const canPlay = !gameStarted;
+        console.log(`Checking 7H: gameStarted=${gameStarted}, canPlay=${canPlay}`);
+        return canPlay;
     }
     
     // If game hasn't started, ONLY 7H can be played
     if (!gameStarted) {
+        console.log(`Game not started yet, blocking ${card} (only 7H allowed)`);
         return false;
     }
     

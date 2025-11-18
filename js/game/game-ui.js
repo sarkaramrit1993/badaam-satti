@@ -94,7 +94,24 @@ function renderPlayerHand(hand) {
     // Get playable cards
     const gameData = gameState.getGameData();
     const board = gameData?.board;
+    
+    // Debug: Log board state for 7H check
+    if (hand.includes('7H')) {
+        console.log('Checking 7H playability - Board state:', JSON.stringify(board));
+        console.log('Game started?', board && Object.values(board).some(s => {
+            if (!s) return false;
+            const seq = Array.isArray(s.sequence) ? s.sequence : [];
+            return (s.seven || false) || seq.length > 0;
+        }));
+    }
+    
     const playableCards = getPlayableCards(hand, board);
+    
+    // Debug: Log playable cards
+    if (hand.includes('7H')) {
+        console.log('Playable cards:', playableCards);
+        console.log('7H is playable?', playableCards.includes('7H'));
+    }
     
     // Render each card
     sortedHand.forEach(cardStr => {
