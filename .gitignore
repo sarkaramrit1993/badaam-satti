@@ -15,6 +15,10 @@ server.pid
 # Admin Tools (DO NOT COMMIT - Security Risk!)
 cleanup-firebase.html
 
+# Test Files (Development Only)
+test-game-over.js
+test-*.js
+
 # Documentation (keep only README.md)
 *_SUMMARY.md
 *_GUIDE.md
