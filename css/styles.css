@@ -610,6 +610,72 @@ button {
     background: var(--success-color);
 }
 
+/* Game Settings */
+.game-settings {
+    background: var(--surface);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.game-settings h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.setting-group {
+    margin-bottom: 1.5rem;
+}
+
+.setting-group:last-child {
+    margin-bottom: 0;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.setting-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.setting-group small {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-left: 2rem;
+    margin-top: 0.25rem;
+}
+
+.setting-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.setting-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    color: var(--text-secondary);
+}
+
+.setting-options input[type="radio"] {
+    accent-color: var(--primary-color);
+}
+
 /* Room Controls */
 .room-controls {
     display: flex;

@@ -3,29 +3,48 @@
 // Track last played card for highlighting
 let lastPlayedCard = null;
 
-// Get playable cards setting from localStorage (default: false)
-function getPlayableCardsSetting() {
-    const saved = localStorage.getItem('showPlayableCards');
-    return saved === 'true';
+// Initialize playable cards setting from room
+async function initPlayableCardsSetting() {
+    if (!roomCode) return;
+    
+    await initPlayableCardsForGame(roomCode, (newValue) => {
+        // Re-render hand when setting changes
+        if (gameState) {
+            renderPlayerHand(gameState.getMyHand());
+        }
+    });
 }
 
-// Toggle playable cards setting
-function togglePlayableCards() {
-    const current = getPlayableCardsSetting();
-    const newValue = !current;
-    localStorage.setItem('showPlayableCards', newValue.toString());
+// Note: getPlayableCardsSetting() is available from playable-cards-settings.js module
+
+// Toggle playable cards setting (host only)
+async function togglePlayableCards() {
+    if (!roomCode) return;
     
-    // Update button appearance
-    const toggle = document.getElementById('playableCardsToggle');
-    if (toggle) {
-        toggle.style.opacity = newValue ? '1' : '0.5';
-        toggle.title = newValue ? 'Hide Playable Cards' : 'Show Playable Cards';
+    const gameData = gameState.getGameData();
+    const isHost = gameData?.metadata?.host === currentUser.uid;
+    
+    if (!isHost) {
+        showError('Only the host can control this setting');
+        return;
     }
     
-    // Re-render hand with new setting
-    renderPlayerHand(gameState.getMyHand());
+    const current = getPlayableCardsSetting();
+    const newValue = !current;
     
-    showToast(newValue ? 'Playable cards highlighted' : 'Playable cards hidden', 'info');
+    try {
+        await updatePlayableCardsSetting(roomCode, newValue);
+        updatePlayableCardsUI(newValue);
+        renderPlayerHand(gameState.getMyHand());
+        showToast(
+            newValue 
+                ? 'Playable cards highlighting enabled for all players' 
+                : 'Playable cards highlighting disabled for all players', 
+            'info'
+        );
+    } catch (error) {
+        showError('Failed to update setting');
+    }
 }
 
 // Render the game board

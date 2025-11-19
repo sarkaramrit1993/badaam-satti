@@ -84,13 +84,25 @@ function setupGameEventHandlers() {
 }
 
 // Initialize game UI
-function initializeGameUI() {
-    // Initialize playable cards toggle button state
+async function initializeGameUI() {
+    // Initialize playable cards setting from room
+    await initPlayableCardsSetting();
+    
+    // Update toggle button state (host only can control)
     const playableToggle = document.getElementById('playableCardsToggle');
     if (playableToggle) {
-        const showPlayable = localStorage.getItem('showPlayableCards') === 'true';
-        playableToggle.style.opacity = showPlayable ? '1' : '0.5';
-        playableToggle.title = showPlayable ? 'Hide Playable Cards' : 'Show Playable Cards';
+        const gameData = gameState.getGameData();
+        const isHost = gameData?.metadata?.host === currentUser.uid;
+        
+        if (isHost) {
+            playableToggle.style.display = 'block';
+            const showPlayable = getPlayableCardsSetting();
+            playableToggle.style.opacity = showPlayable ? '1' : '0.5';
+            playableToggle.title = showPlayable ? 'Hide Playable Cards (Host)' : 'Show Playable Cards (Host)';
+        } else {
+            // Hide toggle for non-hosts
+            playableToggle.style.display = 'none';
+        }
     }
     
     const roomCodeElement = document.getElementById('roomCode');

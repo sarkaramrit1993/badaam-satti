@@ -65,7 +65,8 @@ async function createRoom() {
         const settings = {
             targetScore: roomType === 'session' ? (parseInt(document.getElementById('targetScore').value) || null) : null,
             maxGames: roomType === 'session' ? (parseInt(document.getElementById('maxGames').value) || null) : null,
-            allowLateJoin: roomType === 'session' ? document.getElementById('allowLateJoin').checked : false
+            allowLateJoin: roomType === 'session' ? document.getElementById('allowLateJoin').checked : false,
+            showPlayableCards: true // Default: enabled
         };
         
         const isPublic = roomType === 'session' ? document.getElementById('isPublic').checked : false;
@@ -386,7 +387,7 @@ function setupRoomListeners(roomCode) {
 }
 
 // Update members list display
-function updateMembersList(members) {
+async function updateMembersList(members) {
     const playersList = document.getElementById('playersList');
     playersList.innerHTML = '';
     
@@ -420,9 +421,14 @@ function updateMembersList(members) {
         document.getElementById('startGameBtn').disabled = !allReady;
     }
     
-    // Show 3-player settings if applicable
+    // Show game settings
+    document.getElementById('gameSettings').classList.remove('hidden');
+    
+    // Initialize playable cards setting (modular function)
+    await initPlayableCardsForRoom(currentRoom, isHost);
+    
+    // Show 3-player settings if applicable (host only)
     if (isHost && playerCount === 3) {
-        document.getElementById('gameSettings').classList.remove('hidden');
         document.getElementById('threePlayerSettings').classList.remove('hidden');
         populateCardOptions();
     } else {
