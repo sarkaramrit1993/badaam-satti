@@ -12,7 +12,7 @@
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     /* Header */
     .main-header {
         padding: 0.75rem 1rem;
@@ -70,7 +70,20 @@
         grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr;
         font-size: 0.85rem;
     }
-    
+
+    /* Toast Container */
+    .toast-container {
+        right: 1rem;
+        left: 1rem;
+        top: 1rem;
+    }
+
+    .toast {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 600px) {
     /* Game Header */
     .game-header {
         flex-direction: column;
@@ -161,17 +174,6 @@
     .game-over-actions button {
         width: 100%;
     }
-    
-    /* Toast Container */
-    .toast-container {
-        right: 1rem;
-        left: 1rem;
-        top: 1rem;
-    }
-    
-    .toast {
-        min-width: auto;
-    }
 }
 
 @media (max-width: 480px) {
@@ -249,15 +251,14 @@
 
 /* ============================================================
    Landscape (horizontal) experience — seamless, no page scroll.
-   Covers phone landscape (very short viewports) and tablet / small
-   laptop landscape (up to ~900px tall, <=1366px wide). Large desktop
-   monitors keep the roomy spread-out layout.
+   Covers phone, tablet and laptop landscape (up to 1100px tall and
+   1600px wide); the roomy desktop layout clips its board at these sizes.
+   Larger monitors keep the roomy layout.
    ============================================================ */
 @media (orientation: landscape) and (max-height: 1100px) and (max-width: 1600px) {
     /* Lock page scrolling on the game screen only (index.html shares this
        stylesheet, so scope via the game-page body class). */
     body.game-page {
-        height: 100%;
         overflow: hidden;
         overscroll-behavior: none;
     }
@@ -361,9 +362,6 @@
         padding: 0.3rem 0.45rem;
         border-width: 1px;
         border-radius: 0.5rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
     }
 
     .player-info {
@@ -373,7 +371,7 @@
         gap: 0.3rem;
     }
 
-    .player-name {
+    .opponent .player-name {
         font-size: 0.78rem;
         white-space: nowrap;
         overflow: hidden;
@@ -552,10 +550,21 @@
         max-height: calc(100dvh - 160px);
     }
 
+    /* viewport-fit=cover lets fixed overlays reach under the notch */
+    .modal {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
+    .toast-container {
+        margin-right: env(safe-area-inset-right);
+    }
+
     /* Game over modal fits without scrolling */
     .game-over-content {
         max-width: 92vw;
         max-height: 92vh;
+        max-height: 92dvh;
         padding: 0.9rem 1.1rem;
     }
 
@@ -625,7 +634,7 @@
         font-size: 1.15rem;
     }
 
-    .player-name {
+    .opponent .player-name {
         font-size: 0.9rem;
     }
 
@@ -639,7 +648,7 @@
 }
 
 /* Very short landscape (small phones with browser chrome shown) */
-@media (orientation: landscape) and (max-height: 400px) {
+@media (orientation: landscape) and (max-height: 400px) and (max-width: 1600px) {
     /* Narrower controls pill + hand cards so a 13-card hand fits a 667px phone */
     .game-board {
         --controls-w: 8rem;
@@ -719,7 +728,6 @@
    ============================================================ */
 @media (orientation: portrait) and (max-width: 640px) {
     body.game-page {
-        height: 100%;
         overflow: hidden;
         overscroll-behavior: none;
     }
@@ -815,7 +823,7 @@
         min-width: 0;
     }
 
-    .player-name {
+    .opponent .player-name {
         font-size: 0.75rem;
         white-space: nowrap;
         overflow: hidden;
@@ -1038,6 +1046,21 @@
 
     .cards-sequence .card + .card {
         margin-left: var(--seq-step);
+    }
+
+    /* The last card is never overlapped, so its content stays centered */
+    .cards-sequence .card:last-child {
+        padding-right: 0;
+    }
+}
+
+/* Compact layouts clip overflow to stay scroll-free, so cards don't lift on
+   hover there (the lift would be cut off, and it sticks on touch screens) */
+@media (orientation: landscape) and (max-height: 1100px) and (max-width: 1600px),
+       (orientation: portrait) and (max-width: 640px) {
+    .card:hover,
+    .card.playable:hover {
+        transform: none;
     }
 }
 
